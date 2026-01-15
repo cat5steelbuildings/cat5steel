@@ -17,11 +17,11 @@ exports.handler = async (event, context) => {
         email: data.email,
         phone: data.phone,
         city: data.location,
-        contact_method: data.method,
+        contact_method: data.method === 'call' ? 'Phone' : 'Email',
         building_type: data.buildingType || '',
         building_size: data.buildingSize || '',
         roof_style: data.roofStyle || '',
-        cat5_wind_rating: data.cat5Wind || '',
+        cat_5_wind_rating: data.cat5Wind || '',
         selected_upgrades: data.upgrades || '',
         quote_details: data.quoteJson || ''
       }
