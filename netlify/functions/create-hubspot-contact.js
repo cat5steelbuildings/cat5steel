@@ -1,3 +1,4 @@
+// Updated Jan 17
 exports.handler = async (event, context) => {
   if (event.httpMethod !== 'POST') {
     return {
