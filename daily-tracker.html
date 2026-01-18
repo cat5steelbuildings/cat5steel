@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -306,15 +307,15 @@
                         <h4>💵 Deposit #1</h4>
                         <div class="form-group">
                             <label>Customer Name *</label>
-                            <input type="text" class="deposit-customer" required>
+                            <input type="text" class="deposit-customer">
                         </div>
                         <div class="form-group">
                             <label>Deposit Amount *</label>
-                            <input type="number" step="0.01" class="deposit-amount" placeholder="$0.00" required>
+                            <input type="number" step="0.01" class="deposit-amount" placeholder="$0.00">
                         </div>
                         <div class="form-group">
                             <label>Salesperson *</label>
-                            <select class="deposit-salesperson" required>
+                            <select class="deposit-salesperson">
                                 <option value="">Select...</option>
                                 <option value="Tim">Tim</option>
                                 <option value="Josh">Josh</option>
@@ -492,15 +493,15 @@
                 <h4>💵 Deposit #${depositCount}</h4>
                 <div class="form-group">
                     <label>Customer Name *</label>
-                    <input type="text" class="deposit-customer" required>
+                    <input type="text" class="deposit-customer">
                 </div>
                 <div class="form-group">
                     <label>Deposit Amount *</label>
-                    <input type="number" step="0.01" class="deposit-amount" placeholder="$0.00" required>
+                    <input type="number" step="0.01" class="deposit-amount" placeholder="$0.00">
                 </div>
                 <div class="form-group">
                     <label>Salesperson *</label>
-                    <select class="deposit-salesperson" required>
+                    <select class="deposit-salesperson">
                         <option value="">Select...</option>
                         <option value="Tim">Tim</option>
                         <option value="Josh">Josh</option>
@@ -573,7 +574,35 @@
         document.getElementById('businessForm').addEventListener('submit', async function(e) {
             e.preventDefault();
             
+
+            // Deposit validation: deposits are OPTIONAL.
+            // But if user starts filling any field in a deposit block, require the core fields.
+            const depositEntriesForValidation = document.querySelectorAll('.deposit-entry');
+            for (const entry of depositEntriesForValidation) {
+                const customerEl = entry.querySelector('.deposit-customer');
+                const amountEl = entry.querySelector('.deposit-amount');
+                const salespersonEl = entry.querySelector('.deposit-salesperson');
+                const customer = (customerEl?.value || '').trim();
+                const amount = (amountEl?.value || '').trim();
+                const salesperson = (salespersonEl?.value || '').trim();
+
+                const anyFilled = customer || amount || salesperson;
+                if (anyFilled) {
+                    // Make sure all required pieces are present
+                    if (!customer || !amount || !salesperson) {
+                        document.getElementById('errorMessage').textContent = '❌ If you enter a deposit, please fill Customer Name, Deposit Amount, and Salesperson.';
+                        document.getElementById('errorMessage').style.display = 'block';
+                        setTimeout(() => {
+                            document.getElementById('errorMessage').style.display = 'none';
+                            document.getElementById('errorMessage').textContent = '❌ Error submitting report. Please try again.';
+                        }, 3500);
+                        return;
+                    }
+                }
+            }
+
             // Collect deposit data (up to 6)
+
             const deposits = [];
             const depositEntries = document.querySelectorAll('.deposit-entry');
             depositEntries.forEach((entry, index) => {
@@ -667,15 +696,15 @@ try {
                     <h4>💵 Deposit #1</h4>
                     <div class="form-group">
                         <label>Customer Name *</label>
-                        <input type="text" class="deposit-customer" required>
+                        <input type="text" class="deposit-customer">
                     </div>
                     <div class="form-group">
                         <label>Deposit Amount *</label>
-                        <input type="number" step="0.01" class="deposit-amount" placeholder="$0.00" required>
+                        <input type="number" step="0.01" class="deposit-amount" placeholder="$0.00">
                     </div>
                     <div class="form-group">
                         <label>Salesperson *</label>
-                        <select class="deposit-salesperson" required>
+                        <select class="deposit-salesperson">
                             <option value="">Select...</option>
                             <option value="Tim">Tim</option>
                             <option value="Josh">Josh</option>
@@ -700,44 +729,6 @@ try {
     }, 3000);
 }
             
-            // Show success message
-            document.getElementById('successMessage').style.display = 'block';
-            setTimeout(() => {
-                document.getElementById('successMessage').style.display = 'none';
-                // Reset form
-                document.getElementById('businessForm').reset();
-                document.getElementById('summaryBox').style.display = 'none';
-                
-                // Reset deposits to just one
-                const container = document.getElementById('depositsContainer');
-                container.innerHTML = `
-                    <div class="deposit-entry" data-deposit-id="1">
-                        <h4>💵 Deposit #1</h4>
-                        <div class="form-group">
-                            <label>Customer Name *</label>
-                            <input type="text" class="deposit-customer" required>
-                        </div>
-                        <div class="form-group">
-                            <label>Deposit Amount *</label>
-                            <input type="number" step="0.01" class="deposit-amount" placeholder="$0.00" required>
-                        </div>
-                        <div class="form-group">
-                            <label>Salesperson *</label>
-                            <select class="deposit-salesperson" required>
-                                <option value="">Select...</option>
-                                <option value="Tim">Tim</option>
-                                <option value="Josh">Josh</option>
-                                <option value="Justin">Justin</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label>Notes (Optional)</label>
-                            <textarea class="deposit-notes" placeholder="Deal #, building type, etc."></textarea>
-                        </div>
-                    </div>
-                `;
-                depositCount = 1;
-            }, 2000);
         });
     </script>
 </body>
