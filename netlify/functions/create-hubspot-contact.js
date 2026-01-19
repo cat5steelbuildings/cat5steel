@@ -1,6 +1,4 @@
-// Updated Jan 19
 exports.handler = async (event, context) => {
-  // Only allow POST requests
   if (event.httpMethod !== 'POST') {
     return {
       statusCode: 405,
@@ -10,40 +8,28 @@ exports.handler = async (event, context) => {
 
   try {
     const data = JSON.parse(event.body);
-    
-    // Your HubSpot access token (stored as environment variable)
     const HUBSPOT_TOKEN = process.env.HUBSPOT_ACCESS_TOKEN;
     
-    // Infer contact method if not provided
-    const inferredMethod = (data.method && String(data.method).trim())
-      ? String(data.method).trim()
-      : (data.phone && String(data.phone).replace(/\D/g, '').length >= 7 ? 'call' : 'email');
-
-    // Build an informative quote details field (safe even if you don't add new HubSpot custom properties)
-    const priorityLine = data.leadPriority ? `Priority: ${data.leadPriority}` : (data.phone ? 'Priority: HOT - Call ASAP' : 'Priority: WARM - Email Quote');
-    const typeLine = data.leadType ? `Type: ${data.leadType}` : (data.phone ? 'Type: Phone Callback Requested' : 'Type: Email Only');
-    const combinedQuoteDetails = [priorityLine, typeLine, '', (data.quoteJson || '')].join('\n');
-
-    // Prepare contact data for HubSpot
+    // Fix: Capitalize Phone/Email for contact_method
+    const contactMethod = data.phone && data.phone.trim().length > 0 ? 'Phone' : 'Email';
+    
     const contactData = {
       properties: {
         firstname: data.name.split(' ')[0] || data.name,
         lastname: data.name.split(' ').slice(1).join(' ') || '',
         email: data.email,
         phone: data.phone || '',
-        city: data.location,
-        // Custom properties
-        contact_method: inferredMethod, // "call" or "email"
+        city: data.location || '',
+        contact_method: contactMethod,  // "Phone" or "Email"
         building_type: data.buildingType || '',
         building_size: data.buildingSize || '',
-        roof_style: data.roofStyle || data.eaveStyle || '',
-        cat5_wind_rating: data.cat5Wind || data.windRating || '',
+        roof_style: data.roofStyle || '',
+        cat_5_wind_rating: data.cat5Wind || '',  // Fixed: correct field name with underscores
         selected_upgrades: data.upgrades || '',
-        quote_details: combinedQuoteDetails
+        quote_details: `Priority: ${data.phone ? 'HOT - Call ASAP' : 'WARM - Email Quote'}\n\n${data.quoteJson || ''}`
       }
     };
 
-    // Call HubSpot API
     const response = await fetch('https://api.hubapi.com/crm/v3/objects/contacts', {
       method: 'POST',
       headers: {
@@ -59,30 +45,20 @@ exports.handler = async (event, context) => {
       console.error('HubSpot API error:', result);
       return {
         statusCode: response.status,
-        body: JSON.stringify({ 
-          error: 'Failed to create contact in HubSpot',
-          details: result
-        })
+        body: JSON.stringify({ error: 'Failed to create contact', details: result })
       };
     }
 
     return {
       statusCode: 200,
-      body: JSON.stringify({ 
-        success: true,
-        contactId: result.id,
-        message: 'Contact created in HubSpot'
-      })
+      body: JSON.stringify({ success: true, contactId: result.id })
     };
 
   } catch (error) {
-    console.error('Function error:', error);
+    console.error('Error:', error);
     return {
       statusCode: 500,
-      body: JSON.stringify({ 
-        error: 'Internal server error',
-        message: error.message 
-      })
+      body: JSON.stringify({ error: 'Internal server error', message: error.message })
     };
   }
 };
