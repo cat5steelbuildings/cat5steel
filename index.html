@@ -324,6 +324,18 @@
             font-size: 0.95rem;
         }
 
+        /* -----------------------------------------------------------------
+           PRICE VISIBILITY
+           We intentionally hide price labels during steps 1–7 to reduce
+           confusion and early "sticker shock". Pricing is still calculated
+           behind the scenes and revealed as a range on the final step.
+        ------------------------------------------------------------------ */
+        .image-option-price,
+        .upgrade-price,
+        .size-price {
+            display: none !important;
+        }
+
         /* Size grid */
         .size-grid {
             display: grid;
@@ -1747,9 +1759,13 @@
     <div class="popup-overlay" id="leadPopup">
         <div class="popup-content">
             <div class="popup-close" onclick="closeLeadCapture()">×</div>
-            <div class="popup-title">Unlock Up To 25% OFF</div>
+            <div class="popup-title">Get Your Exact Quote</div>
             <div class="popup-subtitle">
-               💰 Great News! You get a discout. Enter your info below to receive our BEST price with our online discounts. Choose call or email - either way, you get real numbers, not runarounds.
+                ⚠️ Steel prices fluctuate. Lock in your pricing for 7 days.
+                <br><br>
+                Enter your info to receive your exact turnkey quote and available online discount.
+                <br>
+                <span style="color: var(--gray);">Add a phone number if you’d like a faster, more personal callback.</span>
             </div>
             
             <div class="form-group">
@@ -1758,13 +1774,13 @@
             </div>
             
             <div class="form-group">
-                <label class="form-label">Phone *</label>
-                <input type="tel" class="form-input" id="customerPhone" placeholder="(850) 555-1234" required>
-            </div>
-            
-            <div class="form-group">
                 <label class="form-label">Email *</label>
                 <input type="email" class="form-input" id="customerEmail" placeholder="your@email.com" required>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Phone <span style="font-weight: 400; color: var(--gray);">(optional)</span></label>
+                <input type="tel" class="form-input" id="customerPhone" placeholder="(850) 555-1234">
             </div>
             
             <div class="form-group">
@@ -1781,12 +1797,8 @@
                 </label>
             </div>
             
-            <button class="btn btn-success" onclick="submitQuote('call')" style="width: 100%; font-size: 1.1rem; padding: 14px; margin-bottom: 10px;">
-                📞 YES! Call Me With My Quote
-            </button>
-
-            <button class="btn btn-primary" onclick="submitQuote('email')" style="width: 100%; font-size: 1.05rem; padding: 14px;">
-                ✉️ Email Me My Quote
+            <button class="btn btn-success" onclick="submitQuote()" style="width: 100%; font-size: 1.1rem; padding: 14px;">
+                ✅ Send My Exact Quote
             </button>
         </div>
     </div>
@@ -2268,35 +2280,48 @@ function updateProgress() {
             
             // Calculate totals
             const subtotal = basePrice + upgradesTotal;
-            const rangeHigh = subtotal + 1500;
+
+            // Show a RANGE (no exact price): -8% to +12%
+            // Rounded to the nearest $50 for clean numbers
+            const rangeLow = Math.round((subtotal * 0.92) / 50) * 50;
+            const rangeHigh = Math.round((subtotal * 1.12) / 50) * 50;
             
             // Build price breakdown
             const breakdown = document.getElementById('priceBreakdown');
             breakdown.innerHTML = `
                 <div class="price-line">
                     <span class="price-label">${buildingType.toUpperCase()} ${size.replace('x', '×')} (${getEaveStyleName()})</span>
-                    <span class="price-value">$${basePrice.toLocaleString()}</span>
+                    <span class="price-value">&nbsp;</span>
                 </div>
-                ${upgradesList.map(upgrade => 
-                    `<div class="price-line">
-                        <span class="price-label">${upgrade.name}</span>
-                        <span class="price-value">+$${upgrade.price.toLocaleString()}</span>
-                    </div>`
-                ).join('')}
+                ${upgradesList.length ? `
+                    <div class="price-line">
+                        <span class="price-label" style="color: var(--gray);">Selected options</span>
+                        <span class="price-value">&nbsp;</span>
+                    </div>
+                    ${upgradesList.map(upgrade => 
+                        `<div class="price-line" style="opacity: 0.95;">
+                            <span class="price-label">• ${upgrade.name}</span>
+                            <span class="price-value">&nbsp;</span>
+                        </div>`
+                    ).join('')}
+                ` : ''}
                 <div class="price-line" style="border-top: 2px solid var(--primary); padding-top: 12px; margin-top: 8px;">
-                    <span class="price-label" style="font-size: 1.2rem;">YOUR TOTAL</span>
-                    <span class="price-value" style="font-size: 1.2rem;">$${subtotal.toLocaleString()} - $${rangeHigh.toLocaleString()}*</span>
+                    <span class="price-label" style="font-size: 1.2rem;">YOUR QUOTE RANGE</span>
+                    <span class="price-value" style="font-size: 1.2rem;">$${rangeLow.toLocaleString()} - $${rangeHigh.toLocaleString()}</span>
                 </div>
             `;
             
             // Add disclaimer after breakdown
             const disclaimerHtml = `
                 <p style="font-size: 0.85rem; color: var(--gray); margin-top: 15px; line-height: 1.5;">
-                    *Range accounts for site prep, ground leveling, county-specific requirements, and modifications. 
-                    </p>
-                    <div style="color: var(--dark); margin-bottom: 20px; margin-top: 20px; line-height: 1.6; font-size: 1.1rem; font-weight: 700;">
-    Wait! Were Not Done, Click below and unlock an Online Buyer Discount!
-</div>
+                    This range helps account for site conditions, county permitting requirements, delivery distance, and final build details.
+                </p>
+                <div style="color: var(--dark); margin-bottom: 12px; margin-top: 18px; line-height: 1.6; font-size: 1.05rem; font-weight: 700;">
+                    ⚠️ Steel prices fluctuate weekly. Lock in YOUR exact price for 7 days.
+                </div>
+                <div style="color: var(--gray); margin-bottom: 6px; line-height: 1.6; font-size: 0.95rem;">
+                    Submit your info below to receive our best online discount and priority response.
+                </div>
             `;
             breakdown.innerHTML += disclaimerHtml;
             
@@ -2371,18 +2396,22 @@ function getRoofStyleName() {
         }
 
         // Submit quote
-                // Submit quote
-        function submitQuote(method) {
+        function submitQuote() {
             const name = document.getElementById('customerName').value.trim();
             const phone = document.getElementById('customerPhone').value.trim();
             const email = document.getElementById('customerEmail').value.trim();
             const location = document.getElementById('customerLocation').value.trim();
             const agreeTerms = document.getElementById('agreeTerms').checked;
 
-            if (!name || !phone || !email) {
-                alert('Please fill in all required fields (Name, Phone, Email).');
+            if (!name || !email) {
+                alert('Please fill in all required fields (Name and Email).');
                 return;
             }
+
+            // If they provided a phone number, treat as a "call me" lead.
+            const contactMethod = phone ? 'call' : 'email';
+            const leadPriority = phone ? 'HOT - Call ASAP' : 'WARM - Email Quote';
+            const leadType = phone ? 'Phone Callback Requested' : 'Email Only';
             
             if (!agreeTerms) {
                 alert('Please agree to the Terms & Conditions to continue.');
@@ -2403,7 +2432,9 @@ function getRoofStyleName() {
                     colors: state.selectedColors,
                     upgrades: Array.from(state.selectedUpgrades)
                 },
-                method,
+                method: contactMethod,
+                leadPriority,
+                leadType,
                 timestamp: new Date().toISOString()
             };
 
@@ -2417,7 +2448,9 @@ function getRoofStyleName() {
                     phone,
                     email,
                     location,
-                    method,
+                    method: contactMethod,
+                    leadPriority,
+                    leadType,
                     buildingType: quoteData.building.type || "",
                     buildingSize: quoteData.building.size || "",
                     roofStyle: quoteData.building.roofStyle || "",
@@ -2454,7 +2487,9 @@ function getRoofStyleName() {
                     phone,
                     email,
                     location,
-                    method,
+                    method: contactMethod,
+                    leadPriority,
+                    leadType,
                     buildingType: quoteData.building.type || "",
                     buildingSize: quoteData.building.size || "",
                     roofStyle: quoteData.building.roofStyle || "",
@@ -2481,7 +2516,7 @@ function getRoofStyleName() {
             }
 
             // User-facing confirmation
-            if (method === 'email') {
+            if (contactMethod === 'email') {
                 alert(`Thanks ${name}! We'll email your exact quote to ${email} shortly. If you need immediate assistance, call (850) 320-8186.`);
             } else {
                 alert(`Thanks ${name}! A local rep will call you at ${phone} within the next hour with your quote and financing options. If you need immediate assistance, call (850) 320-8186.`);
