@@ -1530,11 +1530,11 @@
                     </div>
                     <div class="upgrade-price">+$750</div>
                 </div>
-                <div class="upgrade-item" onclick="toggleUpgrade('windows', this)">
+                <div class="upgrade-item" onclick="toggleUpgrade('Frame Outs', this)">
                     <div class="upgrade-checkbox"></div>
                     <div class="upgrade-content">
-                        <div class="upgrade-label">Additional Windows (2)</div>
-                        <div class="upgrade-desc">36x48 insulated windows</div>
+                        <div class="upgrade-label">Additional Frame Outs (2)</div>
+                        <div class="upgrade-desc">36x48 insulated Frame Outs</div>
                     </div>
                     <div class="upgrade-price">+$440</div>
                 </div>
@@ -2262,9 +2262,9 @@ function updateProgress() {
                 upgradesList.push({ name: '10x10 Chain Hoist Door', price: 750 });
             }
             
-            if (state.selectedUpgrades.has('windows')) {
+            if (state.selectedUpgrades.has('Frame Outs')) {
                 upgradesTotal += 440;
-                upgradesList.push({ name: 'Additional Windows (2)', price: 440 });
+                upgradesList.push({ name: 'Additional Frame Outs (2)', price: 440 });
             }
             
             if (state.selectedUpgrades.has('colorScrews')) {
