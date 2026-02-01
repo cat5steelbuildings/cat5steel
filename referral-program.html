@@ -259,13 +259,11 @@
       Fill out the form below to refer someone and start earning your $500 bonus
     </p>
     
-    <form name="referral-submission" method="POST" data-netlify="true" netlify-honeypot="bot-field">
+    <form id="referral-form" name="referral-submission" method="POST">
       <!-- Honeypot for spam prevention -->
       <p style="display: none;">
-        <label>Don't fill this out if you're human: <input name="bot-field" /></label>
+        <label>Don't fill this out if you're human: <input name="bot-field" id="bot-field" /></label>
       </p>
-      
-      <input type="hidden" name="form-name" value="referral-submission" />
       
       <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px;">
         <div style="grid-column: 1 / -1;">
@@ -367,9 +365,12 @@
       
       <button 
         type="submit" 
+        id="submit-btn"
         style="width: 100%; padding: 16px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; border-radius: 8px; font-size: 18px; font-weight: 600; cursor: pointer; transition: all 0.3s ease;">
         Submit Referral & Start Earning $500
       </button>
+      
+      <div id="form-message" style="margin-top: 15px; padding: 12px; border-radius: 6px; display: none;"></div>
     </form>
   </div>
 
@@ -480,6 +481,81 @@
       }, 2000);
     });
   }
+
+  // Referral form submission
+  document.getElementById('referral-form').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    
+    // Check honeypot
+    if (document.getElementById('bot-field').value) {
+      return; // Spam submission
+    }
+    
+    const submitBtn = document.getElementById('submit-btn');
+    const formMessage = document.getElementById('form-message');
+    const originalBtnText = submitBtn.textContent;
+    
+    // Disable button and show loading
+    submitBtn.disabled = true;
+    submitBtn.textContent = 'Submitting...';
+    submitBtn.style.opacity = '0.7';
+    formMessage.style.display = 'none';
+    
+    // Collect form data
+    const formData = {
+      referrer_name: document.querySelector('[name="referrer_name"]').value,
+      referrer_phone: document.querySelector('[name="referrer_phone"]').value,
+      referrer_email: document.querySelector('[name="referrer_email"]').value,
+      prospect_name: document.querySelector('[name="prospect_name"]').value,
+      prospect_phone: document.querySelector('[name="prospect_phone"]').value,
+      prospect_email: document.querySelector('[name="prospect_email"]').value,
+      building_type: document.querySelector('[name="building_type"]').value,
+      additional_notes: document.querySelector('[name="additional_notes"]').value
+    };
+    
+    try {
+      const response = await fetch('/.netlify/functions/create-hubspot-referral', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(formData)
+      });
+      
+      const result = await response.json();
+      
+      if (response.ok) {
+        // Success
+        formMessage.style.display = 'block';
+        formMessage.style.background = '#d4edda';
+        formMessage.style.color = '#155724';
+        formMessage.style.border = '1px solid #c3e6cb';
+        formMessage.innerHTML = '<strong>✓ Referral Submitted!</strong><br>We\'ll contact both you and your referral shortly. Thanks for being part of our program!';
+        
+        // Reset form
+        document.getElementById('referral-form').reset();
+        
+        // Scroll to message
+        formMessage.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      } else {
+        throw new Error(result.error || 'Submission failed');
+      }
+    } catch (error) {
+      // Error
+      formMessage.style.display = 'block';
+      formMessage.style.background = '#f8d7da';
+      formMessage.style.color = '#721c24';
+      formMessage.style.border = '1px solid #f5c6cb';
+      formMessage.innerHTML = '<strong>✗ Submission Error</strong><br>Please try again or text "REFERRAL" to our number instead.';
+      
+      console.error('Form submission error:', error);
+    } finally {
+      // Re-enable button
+      submitBtn.disabled = false;
+      submitBtn.textContent = originalBtnText;
+      submitBtn.style.opacity = '1';
+    }
+  });
 </script>
 
 </body>
