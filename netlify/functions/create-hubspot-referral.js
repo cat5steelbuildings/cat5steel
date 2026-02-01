@@ -17,7 +17,8 @@ exports.handler = async (event, context) => {
         lastname: data.prospect_name.split(' ').slice(1).join(' ') || '',
         email: data.prospect_email || 'noemail@referral.placeholder',
         phone: data.prospect_phone || '',
-        company: `REFERRAL from ${data.referrer_name}`
+        company: `🎯 REFERRAL - ${data.building_type || 'Building'} - By: ${data.referrer_name}`,
+        website: `Referrer: ${data.referrer_name} | Ph: ${data.referrer_phone} | Email: ${data.referrer_email} | Type: ${data.building_type} | Notes: ${data.additional_notes || 'none'} | PAY $250 DEPOSIT + $250 GROUND BREAK = $500 TOTAL`
       }
     };
 
@@ -39,49 +40,6 @@ exports.handler = async (event, context) => {
         statusCode: prospectResponse.status,
         body: JSON.stringify({ error: 'Failed to create prospect contact', details: prospectResult })
       };
-    }
-
-    // Create a note on the prospect contact with all referral details
-    const noteBody = `REFERRAL LEAD - $500 Program
-
-Referred by: ${data.referrer_name}
-Referrer Phone: ${data.referrer_phone}
-Referrer Email: ${data.referrer_email}
-
-Building Type: ${data.building_type || 'Not specified'}
-${data.additional_notes ? `Additional Notes: ${data.additional_notes}` : ''}
-
-⚠️ IMPORTANT: This is a referral. Pay $250 on deposit, $250 on ground break.
-Contact referrer when deal closes to arrange payment.`;
-
-    const noteData = {
-      properties: {
-        hs_timestamp: Date.now(),
-        hs_note_body: noteBody,
-        hubspot_owner_id: null
-      }
-    };
-
-    // Add note to prospect
-    const noteResponse = await fetch(`https://api.hubapi.com/crm/v3/objects/notes`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${HUBSPOT_TOKEN}`
-      },
-      body: JSON.stringify(noteData)
-    });
-
-    const noteResult = await noteResponse.json();
-    
-    // Associate note with contact
-    if (noteResponse.ok && noteResult.id) {
-      await fetch(`https://api.hubapi.com/crm/v3/objects/notes/${noteResult.id}/associations/contact/${prospectResult.id}/note_to_contact`, {
-        method: 'PUT',
-        headers: {
-          'Authorization': `Bearer ${HUBSPOT_TOKEN}`
-        }
-      });
     }
 
     // Optionally create/update the REFERRER contact as well
