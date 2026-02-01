@@ -15,20 +15,9 @@ exports.handler = async (event, context) => {
       properties: {
         firstname: data.prospect_name.split(' ')[0] || data.prospect_name,
         lastname: data.prospect_name.split(' ').slice(1).join(' ') || '',
-        email: data.prospect_email || '',
+        email: data.prospect_email || 'noemail@referral.placeholder',
         phone: data.prospect_phone || '',
-        // Custom note with referrer info in a field that exists in free plan
-        hs_note_body: `REFERRAL LEAD - $500 Program
-        
-Referred by: ${data.referrer_name}
-Referrer Phone: ${data.referrer_phone}
-Referrer Email: ${data.referrer_email}
-
-Building Type: ${data.building_type || 'Not specified'}
-${data.additional_notes ? `Notes: ${data.additional_notes}` : ''}
-
-⚠️ IMPORTANT: This is a referral. Pay $250 on deposit, $250 on ground break.
-Contact referrer when deal closes to arrange payment.`
+        company: `REFERRAL from ${data.referrer_name}`
       }
     };
 
@@ -52,6 +41,49 @@ Contact referrer when deal closes to arrange payment.`
       };
     }
 
+    // Create a note on the prospect contact with all referral details
+    const noteBody = `REFERRAL LEAD - $500 Program
+
+Referred by: ${data.referrer_name}
+Referrer Phone: ${data.referrer_phone}
+Referrer Email: ${data.referrer_email}
+
+Building Type: ${data.building_type || 'Not specified'}
+${data.additional_notes ? `Additional Notes: ${data.additional_notes}` : ''}
+
+⚠️ IMPORTANT: This is a referral. Pay $250 on deposit, $250 on ground break.
+Contact referrer when deal closes to arrange payment.`;
+
+    const noteData = {
+      properties: {
+        hs_timestamp: Date.now(),
+        hs_note_body: noteBody,
+        hubspot_owner_id: null
+      }
+    };
+
+    // Add note to prospect
+    const noteResponse = await fetch(`https://api.hubapi.com/crm/v3/objects/notes`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${HUBSPOT_TOKEN}`
+      },
+      body: JSON.stringify(noteData)
+    });
+
+    const noteResult = await noteResponse.json();
+    
+    // Associate note with contact
+    if (noteResponse.ok && noteResult.id) {
+      await fetch(`https://api.hubapi.com/crm/v3/objects/notes/${noteResult.id}/associations/contact/${prospectResult.id}/note_to_contact`, {
+        method: 'PUT',
+        headers: {
+          'Authorization': `Bearer ${HUBSPOT_TOKEN}`
+        }
+      });
+    }
+
     // Optionally create/update the REFERRER contact as well
     // This ensures you have their info in HubSpot for payment tracking
     const referrerData = {
@@ -60,13 +92,7 @@ Contact referrer when deal closes to arrange payment.`
         lastname: data.referrer_name.split(' ').slice(1).join(' ') || '',
         email: data.referrer_email,
         phone: data.referrer_phone || '',
-        hs_note_body: `REFERRAL PARTNER
-        
-Has referred: ${data.prospect_name}
-Referral submitted: ${new Date().toLocaleDateString()}
-Potential earnings: $500
-
-Track this referral to completion for payment.`
+        company: `Referral Partner - Referred ${data.prospect_name}`
       }
     };
 
