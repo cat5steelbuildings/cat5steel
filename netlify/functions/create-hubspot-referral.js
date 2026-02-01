@@ -17,13 +17,8 @@ exports.handler = async (event, context) => {
         lastname: data.prospect_name.split(' ').slice(1).join(' ') || '',
         email: data.prospect_email || '',
         phone: data.prospect_phone || '',
-        contact_method: data.prospect_phone && data.prospect_phone.trim().length > 0 ? 'Phone' : 'Email',
-        building_type: data.building_type || '',
-        lifecyclestage: 'lead',
-        lead_source: 'Referral Program',
-        hs_lead_status: 'NEW',
-        // Custom note with referrer info
-        quote_details: `REFERRAL LEAD - $500 Program
+        // Custom note with referrer info in a field that exists in free plan
+        hs_note_body: `REFERRAL LEAD - $500 Program
         
 Referred by: ${data.referrer_name}
 Referrer Phone: ${data.referrer_phone}
@@ -65,10 +60,7 @@ Contact referrer when deal closes to arrange payment.`
         lastname: data.referrer_name.split(' ').slice(1).join(' ') || '',
         email: data.referrer_email,
         phone: data.referrer_phone || '',
-        contact_method: data.referrer_phone && data.referrer_phone.trim().length > 0 ? 'Phone' : 'Email',
-        lifecyclestage: 'other',
-        lead_source: 'Referral Partner',
-        quote_details: `REFERRAL PARTNER
+        hs_note_body: `REFERRAL PARTNER
         
 Has referred: ${data.prospect_name}
 Referral submitted: ${new Date().toLocaleDateString()}
