@@ -1,0 +1,108 @@
+exports.handler = async (event, context) => {
+  if (event.httpMethod !== 'POST') {
+    return {
+      statusCode: 405,
+      body: JSON.stringify({ error: 'Method not allowed' })
+    };
+  }
+
+  try {
+    const data = JSON.parse(event.body);
+    const HUBSPOT_TOKEN = process.env.HUBSPOT_ACCESS_TOKEN;
+    
+    // Create contact for the PROSPECT (the person being referred)
+    const prospectData = {
+      properties: {
+        firstname: data.prospect_name.split(' ')[0] || data.prospect_name,
+        lastname: data.prospect_name.split(' ').slice(1).join(' ') || '',
+        email: data.prospect_email || '',
+        phone: data.prospect_phone || '',
+        contact_method: data.prospect_phone && data.prospect_phone.trim().length > 0 ? 'Phone' : 'Email',
+        building_type: data.building_type || '',
+        lifecyclestage: 'lead',
+        lead_source: 'Referral Program',
+        hs_lead_status: 'NEW',
+        // Custom note with referrer info
+        quote_details: `REFERRAL LEAD - $500 Program
+        
+Referred by: ${data.referrer_name}
+Referrer Phone: ${data.referrer_phone}
+Referrer Email: ${data.referrer_email}
+
+Building Type: ${data.building_type || 'Not specified'}
+${data.additional_notes ? `Notes: ${data.additional_notes}` : ''}
+
+⚠️ IMPORTANT: This is a referral. Pay $250 on deposit, $250 on ground break.
+Contact referrer when deal closes to arrange payment.`
+      }
+    };
+
+    // Create the prospect contact in HubSpot
+    const prospectResponse = await fetch('https://api.hubapi.com/crm/v3/objects/contacts', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${HUBSPOT_TOKEN}`
+      },
+      body: JSON.stringify(prospectData)
+    });
+
+    const prospectResult = await prospectResponse.json();
+
+    if (!prospectResponse.ok) {
+      console.error('HubSpot API error (prospect):', prospectResult);
+      return {
+        statusCode: prospectResponse.status,
+        body: JSON.stringify({ error: 'Failed to create prospect contact', details: prospectResult })
+      };
+    }
+
+    // Optionally create/update the REFERRER contact as well
+    // This ensures you have their info in HubSpot for payment tracking
+    const referrerData = {
+      properties: {
+        firstname: data.referrer_name.split(' ')[0] || data.referrer_name,
+        lastname: data.referrer_name.split(' ').slice(1).join(' ') || '',
+        email: data.referrer_email,
+        phone: data.referrer_phone || '',
+        contact_method: data.referrer_phone && data.referrer_phone.trim().length > 0 ? 'Phone' : 'Email',
+        lifecyclestage: 'other',
+        lead_source: 'Referral Partner',
+        quote_details: `REFERRAL PARTNER
+        
+Has referred: ${data.prospect_name}
+Referral submitted: ${new Date().toLocaleDateString()}
+Potential earnings: $500
+
+Track this referral to completion for payment.`
+      }
+    };
+
+    const referrerResponse = await fetch('https://api.hubapi.com/crm/v3/objects/contacts', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${HUBSPOT_TOKEN}`
+      },
+      body: JSON.stringify(referrerData)
+    });
+
+    const referrerResult = await referrerResponse.json();
+
+    return {
+      statusCode: 200,
+      body: JSON.stringify({ 
+        success: true, 
+        prospectId: prospectResult.id,
+        referrerId: referrerResult.id || 'existing'
+      })
+    };
+
+  } catch (error) {
+    console.error('Error:', error);
+    return {
+      statusCode: 500,
+      body: JSON.stringify({ error: 'Internal server error', message: error.message })
+    };
+  }
+};
