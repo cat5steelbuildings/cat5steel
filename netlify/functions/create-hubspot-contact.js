@@ -13,6 +13,15 @@ exports.handler = async (event, context) => {
     // Fix: Capitalize Phone/Email for contact_method
     const contactMethod = data.phone && data.phone.trim().length > 0 ? 'Phone' : 'Email';
     
+    // If quote_details is provided (like from concrete calculator), use it as-is
+    // Otherwise, generate the priority message (for steel building quotes)
+    let quoteDetails;
+    if (data.quote_details) {
+      quoteDetails = data.quote_details;
+    } else {
+      quoteDetails = `Priority: ${data.phone ? 'HOT - Call ASAP' : 'WARM - Email Quote'}\n\n${data.quoteJson || ''}`;
+    }
+    
     const contactData = {
       properties: {
         firstname: data.name.split(' ')[0] || data.name,
@@ -22,11 +31,11 @@ exports.handler = async (event, context) => {
         city: data.location || '',
         contact_method: contactMethod,  // "Phone" or "Email"
         building_type: data.buildingType || '',
-        building_size: data.buildingSize || '',
+        building_size: data.building_size || data.buildingSize || '',
         roof_style: data.roofStyle || '',
         cat_5_wind_rating: data.cat5Wind || '',  // Fixed: correct field name with underscores
         selected_upgrades: data.upgrades || '',
-        quote_details: `Priority: ${data.phone ? 'HOT - Call ASAP' : 'WARM - Email Quote'}\n\n${data.quoteJson || ''}`
+        quote_details: quoteDetails
       }
     };
 
