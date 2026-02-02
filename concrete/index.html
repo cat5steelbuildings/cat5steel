@@ -842,8 +842,13 @@
                 name: document.getElementById('customerName').value,
                 phone: document.getElementById('customerPhone').value,
                 email: document.getElementById('customerEmail').value,
+                buildingType: 'CONCRETE PAD',
                 building_size: `${currentQuoteData.length}' x ${currentQuoteData.width}' (${currentQuoteData.squareFeet} sq ft)`,
-                quote_details: `Concrete Quote - ${currentQuoteData.price} - ${currentQuoteData.tier}`
+                quote_details: `🟦 CONCRETE QUOTE 🟦
+${currentQuoteData.price}
+Dimensions: ${currentQuoteData.length}' x ${currentQuoteData.width}' = ${currentQuoteData.squareFeet} sq ft
+Pricing: ${currentQuoteData.tier}
+Source: cat5steelbuildings.com/concrete`
             };
 
             try {
