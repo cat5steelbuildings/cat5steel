@@ -436,6 +436,143 @@
             text-decoration: underline;
         }
 
+        /* Modal styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0,0,0,0.6);
+        }
+
+        .modal.show {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            max-width: 500px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+            animation: slideUp 0.3s ease;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .modal-header h2 {
+            color: #1a237e;
+            margin: 0;
+            font-size: 24px;
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 32px;
+            cursor: pointer;
+            color: #666;
+            line-height: 1;
+            padding: 0;
+            width: 32px;
+            height: 32px;
+        }
+
+        .close-btn:hover {
+            color: #333;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #333;
+            font-weight: 600;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 6px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #2563eb;
+        }
+
+        .quote-summary {
+            background: #f0f9ff;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border: 2px solid #2563eb;
+        }
+
+        .quote-summary h3 {
+            margin: 0 0 10px 0;
+            color: #1e3a8a;
+            font-size: 18px;
+        }
+
+        .quote-summary p {
+            margin: 5px 0;
+            color: #1e3a8a;
+            font-weight: 500;
+        }
+
+        .form-message {
+            padding: 12px;
+            border-radius: 6px;
+            margin-bottom: 15px;
+            display: none;
+        }
+
+        .form-message.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+            display: block;
+        }
+
+        .form-message.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+            display: block;
+        }
+
+        @keyframes slideUp {
+            from { 
+                opacity: 0;
+                transform: translateY(50px);
+            }
+            to { 
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
     </style>
 </head>
 <body>
@@ -485,7 +622,8 @@
 </div>
             <div class="cta-section">
                 <h3>We Can Start as Soon as You're Ready!</h3>
-                <button class="contact-btn" onclick="window.location.href='tel:850-400-8351'">📞 Call Now to Scedule</button>
+                <button class="contact-btn" onclick="window.location.href='tel:850-400-8351'">📞 Call Now to Schedule</button>
+                <button class="contact-btn" onclick="openEmailModal()" style="background: #2563eb; color: white; border: 3px solid #2563eb;">📧 Email Me This Quote</button>
                 <div class="phone-number">‪(850) 320-8186‬</div>
             </div>
 
@@ -524,6 +662,46 @@
                 </div>
                 <p style="margin-top: 10px; font-style: italic;">*Prices assume level site. Grading may be additional if needed.</p>
             </div>
+        </div>
+    </div>
+
+    <!-- Email Quote Modal -->
+    <div id="emailModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Get Your Quote Emailed</h2>
+                <button class="close-btn" onclick="closeEmailModal()">&times;</button>
+            </div>
+            
+            <div id="formMessage" class="form-message"></div>
+            
+            <div class="quote-summary">
+                <h3>Your Quote Details:</h3>
+                <p><strong>Dimensions:</strong> <span id="modalDimensions"></span></p>
+                <p><strong>Square Feet:</strong> <span id="modalSqft"></span></p>
+                <p><strong>Estimated Cost:</strong> <span id="modalPrice"></span></p>
+            </div>
+            
+            <form id="emailQuoteForm" onsubmit="submitEmailQuote(event)">
+                <div class="form-group">
+                    <label>Name *</label>
+                    <input type="text" id="customerName" required placeholder="John Smith">
+                </div>
+                
+                <div class="form-group">
+                    <label>Phone *</label>
+                    <input type="tel" id="customerPhone" required placeholder="(850) 555-1234">
+                </div>
+                
+                <div class="form-group">
+                    <label>Email *</label>
+                    <input type="email" id="customerEmail" required placeholder="john@example.com">
+                </div>
+                
+                <button type="submit" class="contact-btn" style="background: #2563eb; color: white; border: 3px solid #2563eb;">
+                    Send My Quote
+                </button>
+            </form>
         </div>
     </div>
 
@@ -600,6 +778,105 @@
                 calculatePrice();
             }
         });
+
+        // Modal functions
+        let currentQuoteData = {};
+
+        function openEmailModal() {
+            const length = parseFloat(document.getElementById('length').value) || 0;
+            const width = parseFloat(document.getElementById('width').value) || 0;
+            const sqft = length * width;
+            const priceText = document.getElementById('priceDisplay').textContent;
+            const tierText = document.getElementById('tierDisplay').textContent;
+
+            if (sqft === 0) {
+                alert('Please calculate your quote first by entering dimensions.');
+                return;
+            }
+
+            // Store quote data
+            currentQuoteData = {
+                length: length,
+                width: width,
+                squareFeet: sqft,
+                price: priceText,
+                tier: tierText
+            };
+
+            // Populate modal
+            document.getElementById('modalDimensions').textContent = `${length}' × ${width}'`;
+            document.getElementById('modalSqft').textContent = sqft.toLocaleString();
+            document.getElementById('modalPrice').textContent = priceText;
+
+            // Show modal
+            document.getElementById('emailModal').classList.add('show');
+        }
+
+        function closeEmailModal() {
+            document.getElementById('emailModal').classList.remove('show');
+            document.getElementById('formMessage').className = 'form-message';
+            document.getElementById('emailQuoteForm').reset();
+        }
+
+        // Close modal when clicking outside
+        window.onclick = function(event) {
+            const modal = document.getElementById('emailModal');
+            if (event.target === modal) {
+                closeEmailModal();
+            }
+        }
+
+        async function submitEmailQuote(event) {
+            event.preventDefault();
+
+            const formMessage = document.getElementById('formMessage');
+            const submitBtn = event.target.querySelector('button[type="submit"]');
+            const originalBtnText = submitBtn.textContent;
+
+            // Disable button
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Sending...';
+            formMessage.className = 'form-message';
+
+            const formData = {
+                name: document.getElementById('customerName').value,
+                phone: document.getElementById('customerPhone').value,
+                email: document.getElementById('customerEmail').value,
+                building_size: `${currentQuoteData.length}' x ${currentQuoteData.width}' (${currentQuoteData.squareFeet} sq ft)`,
+                quote_details: `Concrete Quote - ${currentQuoteData.price} - ${currentQuoteData.tier}`
+            };
+
+            try {
+                const response = await fetch('/.netlify/functions/create-hubspot-contact', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(formData)
+                });
+
+                const result = await response.json();
+
+                if (response.ok) {
+                    formMessage.className = 'form-message success';
+                    formMessage.innerHTML = '<strong>✓ Quote Sent!</strong><br>Check your email and we\'ll be in touch shortly.';
+                    
+                    // Clear form
+                    setTimeout(() => {
+                        closeEmailModal();
+                    }, 3000);
+                } else {
+                    throw new Error(result.error || 'Submission failed');
+                }
+            } catch (error) {
+                formMessage.className = 'form-message error';
+                formMessage.innerHTML = '<strong>✗ Error</strong><br>Please call us at (850) 320-8186 instead.';
+                console.error('Form submission error:', error);
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.textContent = originalBtnText;
+            }
+        }
     </script>
 </body>
 </html>
