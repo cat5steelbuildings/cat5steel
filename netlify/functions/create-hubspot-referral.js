@@ -20,7 +20,9 @@ exports.handler = async (event, context) => {
         building_type: data.building_type || '',
         contact_method: data.prospect_phone && data.prospect_phone.trim() ? 'Phone' : 'Email',
         referral_source: `${data.referrer_name} - ${data.referrer_phone} - ${data.referrer_email}`,
-        quote_details: `REFERRAL PROGRAM - PAY $250 DEPOSIT + $250 GROUND BREAK = $500 TO REFERRER
+        quote_details: `REFERRAL PROGRAM - TIERED PAYMENT:
+Up to $7k = $150 | $8k-$12k = $250 | $13k-$17k = $350 | $18k+ = $500
+Split 50/50: Half at deposit, half at ground break
 
 ${data.additional_notes || 'No additional notes'}`
       }
