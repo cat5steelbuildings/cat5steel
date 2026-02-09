@@ -47,7 +47,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--tx);min-h
 
 /* STEPS */
 .steps{max-width:620px;margin:22px auto;padding:0 24px 120px;}
-.step{display:none;animation:stepIn 0.3s ease-out;}
+.step{display:none;animation:stepIn 0.3s ease-out;scroll-margin-top:80px;}
 .step.active{display:block;}
 @keyframes stepIn{from{opacity:0;transform:translateY(14px);}to{opacity:1;transform:translateY(0);}}
 .step-q{font-family:'Bebas Neue',sans-serif;font-size:22px;color:#fff;letter-spacing:2px;margin-bottom:3px;}
@@ -219,6 +219,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--tx);min-h
     <span>Size</span>
     <span>Doors</span>
     <span>Frame-Outs</span>
+    <span>Lean-To</span>
     <span>Options</span>
     <span>Details</span>
     <span>Contact</span>
@@ -331,7 +332,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--tx);min-h
       <select class="sf" id="selH"><option value="">Select</option></select>
     </div>
     <div id="liftNote" style="display:none;background:rgba(212,168,83,0.1);border:1px solid rgba(212,168,83,0.25);border-radius:var(--r);padding:10px 14px;margin-top:4px;font-size:12px;color:var(--gd);">
-      Heights 14' and above require a high lift — adds $1,700 to installation.
+      Heights 14' and above require a high lift installation.
     </div>
     <div class="btn-row">
       <button class="btn-ghost btn" onclick="goStep(1)">Back</button>
@@ -385,8 +386,55 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--tx);min-h
     </div>
   </div>
 
-  <!-- STEP 5: OPTIONS -->
+  <!-- STEP 5: LEAN-TO -->
   <div class="step" id="step5">
+    <div class="step-q">LEAN-TO ADDITION</div>
+    <div class="step-sub">Add a covered extension to one or both sides of your building.</div>
+
+    <div style="margin:16px 0;text-align:center;">
+      <div style="display:flex;gap:10px;justify-content:center;">
+        <button class="btn" onclick="showLeanConfig(true)">Yes, Add a Lean-To</button>
+        <button class="btn btn-ghost" onclick="skipLeanTo()">No, Skip</button>
+      </div>
+    </div>
+
+    <div id="leanConfig" style="display:none;">
+      <div style="margin:16px 0;text-align:center;">
+        <label class="step-sub" style="font-weight:600;color:var(--tx);display:block;margin-bottom:8px;">Which side(s)?</label>
+        <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;">
+          <button class="btn btn-ghost lean-side-btn" onclick="pickLeanSide('left')">Left Side</button>
+          <button class="btn btn-ghost lean-side-btn" onclick="pickLeanSide('right')">Right Side</button>
+          <button class="btn btn-ghost lean-side-btn" onclick="pickLeanSide('both')">Both Sides</button>
+        </div>
+      </div>
+
+      <div id="leanLeftDims" style="display:none;margin:14px 0;text-align:center;">
+        <div class="step-sub" style="font-weight:600;color:var(--ac);margin-bottom:8px;">Left Side Lean-To</div>
+        <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;">
+          <div><label class="step-sub" style="display:block;margin-bottom:4px;">Width</label><select class="sf" id="leanLeftW"></select></div>
+          <div><label class="step-sub" style="display:block;margin-bottom:4px;">Length</label><select class="sf" id="leanLeftL"></select></div>
+          <div><label class="step-sub" style="display:block;margin-bottom:4px;">Height</label><select class="sf" id="leanLeftH"></select></div>
+        </div>
+      </div>
+
+      <div id="leanRightDims" style="display:none;margin:14px 0;text-align:center;">
+        <div class="step-sub" style="font-weight:600;color:var(--ac);margin-bottom:8px;">Right Side Lean-To</div>
+        <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;">
+          <div><label class="step-sub" style="display:block;margin-bottom:4px;">Width</label><select class="sf" id="leanRightW"></select></div>
+          <div><label class="step-sub" style="display:block;margin-bottom:4px;">Length</label><select class="sf" id="leanRightL"></select></div>
+          <div><label class="step-sub" style="display:block;margin-bottom:4px;">Height</label><select class="sf" id="leanRightH"></select></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="btn-row" style="margin-top:20px;">
+      <button class="btn-ghost btn" onclick="goStep(4)">Back</button>
+      <button class="btn" id="leanContinueBtn" onclick="confirmLeanTo()" style="display:none;">Continue</button>
+    </div>
+  </div>
+
+  <!-- STEP 6: OPTIONS -->
+  <div class="step" id="step6">
     <div class="step-q">OPTIONS & SERVICES</div>
     <div class="step-sub">Select any additional options you'd like.</div>
 
@@ -402,7 +450,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--tx);min-h
         </div>
         <div class="con-price">
           <div class="big" id="conPriceDisplay">—</div>
-          <div class="sm" id="conSqftDisplay"></div>
+          <div class="sm" id="conSqftDisplay">Included in quote</div>
         </div>
       </div>
     </div>
@@ -412,24 +460,21 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--tx);min-h
     <div class="olist" id="optList">
       <div class="oitem" onclick="togOpt(this,'site_plans')">
         <div class="obox"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div>
-        <div><div class="oi-n">Site Plans — $500</div><div class="oi-d">Engineered site-specific plans</div></div>
+        <div><div class="oi-n">Site Plans</div><div class="oi-d">Engineered site-specific plans</div></div>
       </div>
       <div class="oitem" onclick="togOpt(this,'permitting')">
         <div class="obox"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div>
-        <div><div class="oi-n">Permitting Process — $350</div><div class="oi-d">We handle all county paperwork</div></div>
+        <div><div class="oi-n">Permitting Process</div><div class="oi-d">We handle all county paperwork</div></div>
       </div>
       <div class="oitem" onclick="togOpt(this,'site_and_permit')">
         <div class="obox"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div>
-        <div><div class="oi-n">Site Plans + Permitting — $850</div><div class="oi-d">We handle everything — save $50 bundled</div></div>
+        <div><div class="oi-n">Site Plans + Permitting</div><div class="oi-d">We handle everything — bundled discount</div></div>
       </div>
       <div class="oitem" onclick="togOpt(this,'insulation')">
         <div class="obox"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div>
         <div><div class="oi-n">Insulation</div><div class="oi-d">2" Fiberglass or Reflective Double Bubble</div></div>
       </div>
-      <div class="oitem" onclick="togOpt(this,'lean_to')">
-        <div class="obox"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div>
-        <div><div class="oi-n">Lean-To</div><div class="oi-d">Covered extension on one or both sides</div></div>
-      </div>
+
       <div class="oitem" onclick="togOpt(this,'12gauge')">
         <div class="obox"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div>
         <div><div class="oi-n">12-Gauge Frame Upgrade</div><div class="oi-d">Heavy-duty framing with 20-year warranty</div></div>
@@ -440,13 +485,13 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--tx);min-h
       </div>
     </div>
     <div class="btn-row">
-      <button class="btn-ghost btn" onclick="goStep(4)">Back</button>
+      <button class="btn-ghost btn" onclick="goStep(5)">Back</button>
       <button class="btn" onclick="confirmOptions()">Continue</button>
     </div>
   </div>
 
-  <!-- STEP 5: SPECIAL INSTRUCTIONS + TIMELINE -->
-  <div class="step" id="step6">
+  <!-- STEP 7: SPECIAL INSTRUCTIONS + TIMELINE -->
+  <div class="step" id="step7">
     <div class="step-q">ANYTHING ELSE WE SHOULD KNOW?</div>
     <div class="step-sub">Special requirements, specific use case, questions — anything helps us give you the best quote.</div>
     <textarea class="tarea" id="specialNotes" placeholder="Example: I need a 14x14 door on each end for drive-through access, storing two RVs and a boat, need electrical run, etc."></textarea>
@@ -468,30 +513,30 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--tx);min-h
       </div>
     </div>
     <div class="btn-row">
-      <button class="btn-ghost btn" onclick="goStep(5)">Back</button>
+      <button class="btn-ghost btn" onclick="goStep(6)">Back</button>
       <button class="btn" onclick="confirmDetails()">Continue</button>
     </div>
   </div>
 
-  <!-- STEP 6: CONTACT -->
-  <div class="step" id="step7">
+  <!-- STEP 8: CONTACT -->
+  <div class="step" id="step8">
     <div class="step-q">WHERE SHOULD WE SEND YOUR QUOTE?</div>
     <div class="step-sub">We'll follow up with your complete estimate — usually within a few hours.</div>
     <input type="text" class="lf" id="leadName" placeholder="Your name">
     <input type="tel" class="lf" id="leadPhone" placeholder="Best phone number">
     <input type="email" class="lf" id="leadEmail" placeholder="Email (optional)">
     <div class="btn-row">
-      <button class="btn-ghost btn" onclick="goStep(6)">Back</button>
+      <button class="btn-ghost btn" onclick="goStep(7)">Back</button>
       <button class="btn btn-big btn-green" onclick="submitLead()">GET MY FREE QUOTE</button>
     </div>
   </div>
 
-  <!-- STEP 7: CONFIRMATION -->
-  <div class="step" id="step8">
+  <!-- STEP 9: CONFIRMATION -->
+  <div class="step" id="step9">
     <div class="conf">
       <div class="big-ck"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div>
       <h3 id="confName">YOU'RE ALL SET</h3>
-      <p>Our team is reviewing your building configuration and will reach out shortly with a detailed quote.</p>
+      <p>We'll have your personalized quote ready ASAP! Our team is reviewing your building configuration now.</p>
       <p style="margin-top:12px;">Can't wait? Call us now:</p>
       <p style="margin-top:6px;"><a href="tel:8503208186" style="font-family:'Bebas Neue',sans-serif;font-size:24px;letter-spacing:3px;">(850) 320-8186</a></p>
       <p style="margin-top:16px;font-size:12px;color:var(--gd);">We handle everything — so you don't have to.</p>
@@ -510,11 +555,11 @@ const D = {
   zip:'', style:'', width:0, length:0, height:0,
   garageDoors:0, garageDoorSize:'10x10',
   walkInDoors:1, windows:0, frameouts:[],
-  options:[], notes:'', timeline:'', name:'', phone:'', email:''
+  options:[], leanTo:'none', leanLeft:null, leanRight:null, notes:'', timeline:'', name:'', phone:'', email:''
 };
 
-const STEPS = ['Location','Style','Size','Doors','Frame-Outs','Options','Details','Contact'];
-const TOTAL_STEPS = 8;
+const STEPS = ['Location','Style','Size','Doors','Frame-Outs','Lean-To','Options','Details','Contact'];
+const TOTAL_STEPS = 9;
 let curStep = 0;
 
 function goStep(n) {
@@ -528,7 +573,7 @@ function goStep(n) {
   for(let i=0;i<labels.length;i++) {
     labels[i].className = i<n ? 'done' : i===n ? 'active' : '';
   }
-  window.scrollTo({top:0,behavior:'smooth'});
+  document.getElementById('step'+n).scrollIntoView({behavior:'smooth',block:'start'});
 }
 
 // STEP 0: ZIP
@@ -676,9 +721,8 @@ function confirmDoors() {
 // STEP 5: OPTIONS — populate concrete price when entering this step
 function updateConcretePrice() {
   const sq = D.width * D.length;
-  const price = Math.round(sq * 9.50);
-  document.getElementById('conPriceDisplay').textContent = '$' + price.toLocaleString();
-  document.getElementById('conSqftDisplay').textContent = sq.toLocaleString() + ' sq ft';
+  document.getElementById('conPriceDisplay').textContent = sq.toLocaleString() + ' sq ft';
+  document.getElementById('conSqftDisplay').textContent = 'Included in quote';
   document.getElementById('conDesc').textContent = D.width + "' x " + D.length + "' pad — professionally poured and finished";
 }
 function toggleConcrete() {
@@ -706,7 +750,61 @@ document.querySelectorAll('.oitem').forEach(el => {
   const match = onclick.match(/'([^']+)'/);
   if(match) el.dataset.opt = match[1];
 });
-function confirmOptions() { goStep(6); }
+
+// STEP 5: LEAN-TO
+function showLeanConfig(show) {
+  document.getElementById('leanConfig').style.display = show ? 'block' : 'none';
+  document.getElementById('leanContinueBtn').style.display = 'inline-block';
+  if(!show) {
+    D.leanTo = 'none';
+    confirmLeanTo();
+  }
+}
+function skipLeanTo() {
+  D.leanTo = 'none';
+  D.leanLeft = null;
+  D.leanRight = null;
+  updateConcretePrice();
+  goStep(6);
+}
+function pickLeanSide(side) {
+  document.querySelectorAll('.lean-side-btn').forEach(b => b.classList.remove('on'));
+  event.target.classList.add('on');
+  D.leanTo = side;
+  const maxW = D.width || 60;
+  const maxL = D.length || 400;
+  const maxH = D.height || 16;
+  // Populate dropdowns (width capped at half building width)
+  const leanMaxW = Math.floor(maxW / 2);
+  function fillSel(id, max, step, suffix) {
+    const sel = document.getElementById(id);
+    if(!sel) return;
+    sel.innerHTML = '<option value="">Select</option>';
+    for(let v = step; v <= max; v += step) sel.innerHTML += '<option value="'+v+'">'+v+suffix+'</option>';
+  }
+  fillSel('leanLeftW', leanMaxW, 2, "' wide");
+  fillSel('leanLeftL', maxL, 1, "' long");
+  fillSel('leanLeftH', maxH, 1, "' tall");
+  fillSel('leanRightW', leanMaxW, 2, "' wide");
+  fillSel('leanRightL', maxL, 1, "' long");
+  fillSel('leanRightH', maxH, 1, "' tall");
+  document.getElementById('leanLeftDims').style.display = (side==='left'||side==='both') ? 'block' : 'none';
+  document.getElementById('leanRightDims').style.display = (side==='right'||side==='both') ? 'block' : 'none';
+}
+function confirmLeanTo() {
+  if(D.leanTo !== 'none') {
+    if(D.leanTo === 'left' || D.leanTo === 'both') {
+      D.leanLeft = { width: document.getElementById('leanLeftW').value, length: document.getElementById('leanLeftL').value, height: document.getElementById('leanLeftH').value };
+    }
+    if(D.leanTo === 'right' || D.leanTo === 'both') {
+      D.leanRight = { width: document.getElementById('leanRightW').value, length: document.getElementById('leanRightL').value, height: document.getElementById('leanRightH').value };
+    }
+  }
+  updateConcretePrice();
+  goStep(6);
+}
+
+function confirmOptions() { goStep(7); }
 
 // STEP 6: DETAILS
 let selTimeline = null;
@@ -718,7 +816,7 @@ function pickRadio(el, val) {
 function confirmDetails() {
   D.notes = document.getElementById('specialNotes').value;
   D.timeline = selTimeline || 'not specified';
-  goStep(7);
+  goStep(8);
 }
 
 // STEP 7: SUBMIT
@@ -809,7 +907,7 @@ function submitLead() {
 
   console.log('LEAD CAPTURED:', quoteJson);
   document.getElementById('confName').textContent = "YOU'RE ALL SET, " + n.toUpperCase();
-  goStep(8);
+  goStep(9);
 }
 
 // Phone number formatting
