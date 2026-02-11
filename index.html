@@ -37,7 +37,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--tx);min-h
 .hero .slogan{font-size:12px;color:var(--gd);font-weight:600;letter-spacing:2px;text-transform:uppercase;margin-top:10px;}
 
 /* PROGRESS */
-.prog{max-width:580px;margin:18px auto 0;padding:0 24px;}
+.prog{max-width:620px;margin:18px auto 0;padding:0 24px;}
 .prog-track{height:3px;background:var(--bd);border-radius:2px;overflow:hidden;}
 .prog-fill{height:100%;background:linear-gradient(90deg,var(--ac),var(--ac2));transition:width 0.4s ease;width:0%;}
 .prog-labels{display:flex;justify-content:space-between;margin-top:5px;}
@@ -167,6 +167,22 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--tx);min-h
 .float-call svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2;}
 @keyframes floatPulse{0%,100%{box-shadow:0 4px 20px rgba(200,85,58,0.4);}50%{box-shadow:0 4px 28px rgba(200,85,58,0.6);}}
 
+/* WIND RATING CARDS */
+.wind-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;}
+.wcard{background:var(--sf);border:2px solid var(--bd);border-radius:var(--r);padding:18px 14px;cursor:pointer;transition:all 0.2s;text-align:center;position:relative;}
+.wcard:hover{border-color:var(--bd2);transform:translateY(-2px);}
+.wcard.sel{border-color:var(--ac);box-shadow:0 0 16px rgba(200,85,58,0.12);}
+.wcard.sel.cat5{border-color:var(--gd);box-shadow:0 0 20px rgba(212,168,83,0.15);}
+.wcard .wmph{font-family:'Bebas Neue',sans-serif;font-size:36px;color:#fff;letter-spacing:2px;line-height:1;}
+.wcard.sel .wmph{color:var(--ac2);}
+.wcard.sel.cat5 .wmph{color:var(--gd);}
+.wcard .wlabel{font-size:11px;color:var(--tx2);font-weight:600;letter-spacing:1px;text-transform:uppercase;margin-top:4px;}
+.wcard .wtag{font-size:10px;color:var(--tx2);margin-top:6px;line-height:1.4;}
+.wcard .ck{position:absolute;top:5px;right:5px;width:22px;height:22px;background:var(--ac);border-radius:50%;display:none;align-items:center;justify-content:center;}
+.wcard.sel .ck{display:flex;}
+.wcard.sel.cat5 .ck{background:var(--gd);}
+.wcard .cat5badge{display:inline-block;background:linear-gradient(135deg,rgba(212,168,83,0.15),rgba(212,168,83,0.08));border:1px solid rgba(212,168,83,0.3);border-radius:3px;padding:2px 8px;font-size:9px;color:var(--gd);font-weight:700;letter-spacing:1.5px;text-transform:uppercase;margin-top:8px;}
+
 /* RESPONSIVE */
 @media(max-width:640px){
   .hdr{padding:10px 14px;}
@@ -174,9 +190,13 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--tx);min-h
   .badge{display:none;}
   .hero h2{font-size:30px;}
   .style-grid{grid-template-columns:repeat(2,1fr);}
+  .wind-grid{grid-template-columns:1fr 1fr 1fr;}
   .srow{flex-direction:column;align-items:stretch;gap:6px;}
   .sf{min-width:100%;}
   .steps{padding:0 14px 120px;}
+}
+@media(max-width:400px){
+  .wind-grid{grid-template-columns:1fr;}
 }
 </style>
 </head>
@@ -217,6 +237,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--tx);min-h
     <span class="active">Location</span>
     <span>Style</span>
     <span>Size</span>
+    <span>Wind</span>
     <span>Doors</span>
     <span>Frame-Outs</span>
     <span>Lean-To</span>
@@ -307,7 +328,6 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--tx);min-h
         <div class="sl">Equipment</div>
         <div class="ck"><svg class="cksvg" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div>
       </div>
-
     </div>
     <div class="btn-row">
       <button class="btn-ghost btn" onclick="goStep(0)">Back</button>
@@ -340,8 +360,42 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--tx);min-h
     </div>
   </div>
 
-  <!-- STEP 3: DOORS -->
+  <!-- STEP 3: WIND RATING (NEW) -->
   <div class="step" id="step3">
+    <div class="step-q">WIND RATING CERTIFICATION</div>
+    <div class="step-sub">Select the wind speed certification for your building. Florida and coastal areas typically require 170 MPH or higher.</div>
+    <div class="wind-grid" id="windGrid">
+      <div class="wcard" onclick="pickWind(this,'140')">
+        <div class="wmph">140</div>
+        <div class="wlabel">MPH</div>
+        <div class="wtag">Standard rating</div>
+        <div class="ck"><svg class="cksvg" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div>
+      </div>
+      <div class="wcard" onclick="pickWind(this,'170')">
+        <div class="wmph">170</div>
+        <div class="wlabel">MPH</div>
+        <div class="wtag">Enhanced protection</div>
+        <div class="ck"><svg class="cksvg" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div>
+      </div>
+      <div class="wcard cat5" onclick="pickWind(this,'180')">
+        <div class="wmph">180</div>
+        <div class="wlabel">MPH</div>
+        <div class="wtag">Maximum hurricane protection</div>
+        <div class="cat5badge">CAT5 RATED</div>
+        <div class="ck"><svg class="cksvg" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div>
+      </div>
+    </div>
+    <div id="windWarning" style="display:none;background:rgba(200,85,58,0.1);border:1px solid rgba(200,85,58,0.25);border-radius:var(--r);padding:10px 14px;margin-top:12px;font-size:12px;color:var(--ac2);">
+      Please select a wind rating to continue.
+    </div>
+    <div class="btn-row">
+      <button class="btn-ghost btn" onclick="goStep(2)">Back</button>
+      <button class="btn" id="windBtn" onclick="confirmWind()" disabled>Select a wind rating</button>
+    </div>
+  </div>
+
+  <!-- STEP 4: DOORS -->
+  <div class="step" id="step4">
     <div class="step-q">DOORS & WINDOWS</div>
     <div class="step-sub">How many of each do you need?</div>
     <div class="cgroup">
@@ -360,13 +414,13 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--tx);min-h
       </div>
     </div>
     <div class="btn-row">
-      <button class="btn-ghost btn" onclick="goStep(2)">Back</button>
+      <button class="btn-ghost btn" onclick="goStep(3)">Back</button>
       <button class="btn" onclick="confirmDoors()">Continue</button>
     </div>
   </div>
 
-  <!-- STEP 4: FRAME-OUTS -->
-  <div class="step" id="step4">
+  <!-- STEP 5: FRAME-OUTS -->
+  <div class="step" id="step5">
     <div class="step-q">FRAME-OUTS</div>
     <div class="step-sub">Need any pre-framed openings for future doors, windows, or access points? Select how many and the size of each.</div>
     <div class="cgroup">
@@ -380,14 +434,14 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--tx);min-h
       <div id="foSizeList"></div>
     </div>
     <div class="btn-row">
-      <button class="btn-ghost btn" onclick="goStep(3)">Back</button>
+      <button class="btn-ghost btn" onclick="goStep(4)">Back</button>
       <button class="btn" onclick="confirmFrameouts()">Continue</button>
       <button class="btn btn-ghost" onclick="D.frameouts=[];document.getElementById('foV').textContent='0';document.getElementById('foSizeArea').style.display='none';confirmFrameouts();">No frame-outs needed</button>
     </div>
   </div>
 
-  <!-- STEP 5: LEAN-TO -->
-  <div class="step" id="step5">
+  <!-- STEP 6: LEAN-TO -->
+  <div class="step" id="step6">
     <div class="step-q">LEAN-TO ADDITION</div>
     <div class="step-sub">Add a covered extension to one or both sides of your building.</div>
 
@@ -428,13 +482,13 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--tx);min-h
     </div>
 
     <div class="btn-row" style="margin-top:20px;">
-      <button class="btn-ghost btn" onclick="goStep(4)">Back</button>
+      <button class="btn-ghost btn" onclick="goStep(5)">Back</button>
       <button class="btn" id="leanContinueBtn" onclick="confirmLeanTo()" style="display:none;">Continue</button>
     </div>
   </div>
 
-  <!-- STEP 6: OPTIONS -->
-  <div class="step" id="step6">
+  <!-- STEP 7: OPTIONS -->
+  <div class="step" id="step7">
     <div class="step-q">OPTIONS & SERVICES</div>
     <div class="step-sub">Select any additional options you'd like.</div>
 
@@ -474,7 +528,6 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--tx);min-h
         <div class="obox"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div>
         <div><div class="oi-n">Insulation</div><div class="oi-d">2" Fiberglass or Reflective Double Bubble</div></div>
       </div>
-
       <div class="oitem" onclick="togOpt(this,'12gauge')">
         <div class="obox"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div>
         <div><div class="oi-n">12-Gauge Frame Upgrade</div><div class="oi-d">Heavy-duty framing with 20-year warranty</div></div>
@@ -485,13 +538,13 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--tx);min-h
       </div>
     </div>
     <div class="btn-row">
-      <button class="btn-ghost btn" onclick="goStep(5)">Back</button>
+      <button class="btn-ghost btn" onclick="goStep(6)">Back</button>
       <button class="btn" onclick="confirmOptions()">Continue</button>
     </div>
   </div>
 
-  <!-- STEP 7: SPECIAL INSTRUCTIONS + TIMELINE -->
-  <div class="step" id="step7">
+  <!-- STEP 8: SPECIAL INSTRUCTIONS + TIMELINE -->
+  <div class="step" id="step8">
     <div class="step-q">ANYTHING ELSE WE SHOULD KNOW?</div>
     <div class="step-sub">Special requirements, specific use case, questions — anything helps us give you the best quote.</div>
     <textarea class="tarea" id="specialNotes" placeholder="Example: I need a 14x14 door on each end for drive-through access, storing two RVs and a boat, need electrical run, etc."></textarea>
@@ -513,26 +566,26 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--tx);min-h
       </div>
     </div>
     <div class="btn-row">
-      <button class="btn-ghost btn" onclick="goStep(6)">Back</button>
+      <button class="btn-ghost btn" onclick="goStep(7)">Back</button>
       <button class="btn" onclick="confirmDetails()">Continue</button>
     </div>
   </div>
 
-  <!-- STEP 8: CONTACT -->
-  <div class="step" id="step8">
+  <!-- STEP 9: CONTACT -->
+  <div class="step" id="step9">
     <div class="step-q">WHERE SHOULD WE SEND YOUR QUOTE?</div>
     <div class="step-sub">We'll follow up with your complete estimate — usually within a few hours.</div>
     <input type="text" class="lf" id="leadName" placeholder="Your name">
     <input type="tel" class="lf" id="leadPhone" placeholder="Best phone number">
     <input type="email" class="lf" id="leadEmail" placeholder="Email (optional)">
     <div class="btn-row">
-      <button class="btn-ghost btn" onclick="goStep(7)">Back</button>
+      <button class="btn-ghost btn" onclick="goStep(8)">Back</button>
       <button class="btn btn-big btn-green" onclick="submitLead()">GET MY FREE QUOTE</button>
     </div>
   </div>
 
-  <!-- STEP 9: CONFIRMATION -->
-  <div class="step" id="step9">
+  <!-- STEP 10: CONFIRMATION -->
+  <div class="step" id="step10">
     <div class="conf">
       <div class="big-ck"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div>
       <h3 id="confName">YOU'RE ALL SET</h3>
@@ -552,22 +605,21 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--tx);min-h
 
 <script>
 const D = {
-  zip:'', style:'', width:0, length:0, height:0,
+  zip:'', style:'', width:0, length:0, height:0, windRating:'',
   garageDoors:0, garageDoorSize:'10x10',
   walkInDoors:1, windows:0, frameouts:[],
   options:[], leanTo:'none', leanLeft:null, leanRight:null, notes:'', timeline:'', name:'', phone:'', email:''
 };
 
-const STEPS = ['Location','Style','Size','Doors','Frame-Outs','Lean-To','Options','Details','Contact'];
-const TOTAL_STEPS = 9;
+const STEPS = ['Location','Style','Size','Wind','Doors','Frame-Outs','Lean-To','Options','Details','Contact'];
+const TOTAL_STEPS = 10;
 let curStep = 0;
 
 function goStep(n) {
   document.querySelectorAll('.step').forEach(s=>s.classList.remove('active'));
   document.getElementById('step'+n).classList.add('active');
   curStep = n;
-  // progress
-  const pct = Math.round((n / (TOTAL_STEPS-1)) * 100);
+  const pct = Math.round((n / TOTAL_STEPS) * 100);
   document.getElementById('progFill').style.width = pct+'%';
   const labels = document.getElementById('progLabels').children;
   for(let i=0;i<labels.length;i++) {
@@ -599,7 +651,6 @@ function pickStyle(el, style) {
 function confirmStyle() {
   if(!selStyle) return;
   D.style = selStyle;
-
   populateSize();
   goStep(2);
 }
@@ -609,16 +660,12 @@ function populateSize() {
   const sw = document.getElementById('selW');
   const sl = document.getElementById('selL');
   const sh = document.getElementById('selH');
-  // Width: 10-60 every 2 feet
   sw.innerHTML = '<option value="">Select width</option>';
-  for(let w=10;w<=60;w+=2) sw.innerHTML += `<option value="${w}">${w}' wide</option>`;
-  // Length: 20-400 every foot
+  for(let w=10;w<=60;w+=2) sw.innerHTML += '<option value="'+w+'">'+w+'\' wide</option>';
   sl.innerHTML = '<option value="">Select length</option>';
-  for(let l=20;l<=400;l++) sl.innerHTML += `<option value="${l}">${l}' long</option>`;
-  // Height: 8-20 every foot
+  for(let l=20;l<=400;l++) sl.innerHTML += '<option value="'+l+'">'+l+'\' long</option>';
   sh.innerHTML = '<option value="">Select height</option>';
-  for(let h=8;h<=20;h++) sh.innerHTML += `<option value="${h}">${h}' tall</option>`;
-
+  for(let h=8;h<=20;h++) sh.innerHTML += '<option value="'+h+'">'+h+'\' tall</option>';
   const checkSize = () => {
     const w=sw.value, l=sl.value, h=sh.value;
     document.getElementById('sizeBtn').disabled = !(w&&l&&h);
@@ -639,7 +686,27 @@ function confirmSize() {
   goStep(3);
 }
 
-// STEP 3: DOORS
+// STEP 3: WIND RATING (NEW)
+let selWind = null;
+function pickWind(el, mph) {
+  document.querySelectorAll('.wcard').forEach(c=>c.classList.remove('sel'));
+  el.classList.add('sel');
+  selWind = mph;
+  document.getElementById('windWarning').style.display = 'none';
+  const btn = document.getElementById('windBtn');
+  btn.disabled = false;
+  btn.textContent = 'Continue with ' + mph + ' MPH';
+}
+function confirmWind() {
+  if(!selWind) {
+    document.getElementById('windWarning').style.display = 'block';
+    return;
+  }
+  D.windRating = selWind;
+  goStep(4);
+}
+
+// STEP 4: DOORS
 const GD_OPTIONS = '<option value="6x6">6x6</option><option value="6x7">6x7</option><option value="8x7">8x7</option><option value="8x8">8x8</option><option value="9x7">9x7</option><option value="9x8">9x8</option><option value="10x7">10x7</option><option value="10x8">10x8</option><option value="10x9">10x9</option><option value="10x10" selected>10x10</option><option value="10x10ch">10x10 (Chain Hoist)</option><option value="10x12ch">10x12 (Chain Hoist)</option><option value="12x8ch">12x8 (Chain Hoist)</option><option value="12x10ch">12x10 (Chain Hoist)</option><option value="12x12ch">12x12 (Chain Hoist)</option><option value="12x14ch">12x14 (Chain Hoist)</option><option value="14x11ch">14x11 (Chain Hoist)</option><option value="14x12ch">14x12 (Chain Hoist)</option><option value="14x14ch">14x14 (Chain Hoist)</option><option value="16x14ch">16x14 (Chain Hoist)</option>';
 
 function renderGdSizes(count) {
@@ -648,10 +715,7 @@ function renderGdSizes(count) {
   container.style.display='block';
   let h = '';
   for(let i=1; i<=count; i++) {
-    h += `<div class="srow" style="margin-bottom:6px;">
-      <label style="min-width:70px;">Door ${i}</label>
-      <select class="sf gdsize-sel" data-door="${i}">${GD_OPTIONS}</select>
-    </div>`;
+    h += '<div class="srow" style="margin-bottom:6px;"><label style="min-width:70px;">Door '+i+'</label><select class="sf gdsize-sel" data-door="'+i+'">'+GD_OPTIONS+'</select></div>';
   }
   container.innerHTML = h;
 }
@@ -664,10 +728,8 @@ function adj(type, delta) {
   else { el=document.getElementById('wnV'); max=10; }
   let v = Math.max(min, Math.min(max, parseInt(el.textContent)+delta));
   el.textContent = v;
-  if(type==='gd') {
-    D.garageDoors = v;
-    renderGdSizes(v);
-  } else if(type==='wd') D.walkInDoors = v;
+  if(type==='gd') { D.garageDoors = v; renderGdSizes(v); }
+  else if(type==='wd') D.walkInDoors = v;
   else if(type==='fo') renderFrameouts(v);
   else D.windows = v;
 }
@@ -679,18 +741,12 @@ function renderFrameouts(count) {
   if(count === 0) { area.style.display='none'; list.innerHTML=''; return; }
   area.style.display='block';
   let wOpts = '';
-  for(let w=1;w<=20;w++) wOpts += `<option value="${w}">${w}'</option>`;
+  for(let w=1;w<=20;w++) wOpts += '<option value="'+w+'">'+w+'\'</option>';
   let hOpts = '';
-  for(let h=1;h<=20;h++) hOpts += `<option value="${h}">${h}'</option>`;
+  for(let h=1;h<=20;h++) hOpts += '<option value="'+h+'">'+h+'\'</option>';
   let html = '';
   for(let i=1;i<=count;i++) {
-    html += `<div class="srow" style="margin-bottom:8px;background:var(--sf);padding:10px 12px;border-radius:var(--r);border:1px solid var(--bd);">
-      <label style="min-width:80px;font-weight:600;color:var(--tx);">Frame-Out ${i}</label>
-      <select class="sf fo-w" data-fo="${i}" style="max-width:100px;">${wOpts}</select>
-      <span style="color:var(--tx2);font-size:12px;">wide x</span>
-      <select class="sf fo-h" data-fo="${i}" style="max-width:100px;">${hOpts}</select>
-      <span style="color:var(--tx2);font-size:12px;">tall</span>
-    </div>`;
+    html += '<div class="srow" style="margin-bottom:8px;background:var(--sf);padding:10px 12px;border-radius:var(--r);border:1px solid var(--bd);"><label style="min-width:80px;font-weight:600;color:var(--tx);">Frame-Out '+i+'</label><select class="sf fo-w" data-fo="'+i+'" style="max-width:100px;">'+wOpts+'</select><span style="color:var(--tx2);font-size:12px;">wide x</span><select class="sf fo-h" data-fo="'+i+'" style="max-width:100px;">'+hOpts+'</select><span style="color:var(--tx2);font-size:12px;">tall</span></div>';
   }
   list.innerHTML = html;
 }
@@ -705,7 +761,7 @@ function confirmFrameouts() {
     });
   }
   updateConcretePrice();
-  goStep(5);
+  goStep(6);
 }
 
 function confirmDoors() {
@@ -715,10 +771,10 @@ function confirmDoors() {
       D.garageDoorSizes.push(sel.value);
     });
   }
-  goStep(4);
+  goStep(5);
 }
 
-// STEP 5: OPTIONS — populate concrete price when entering this step
+// OPTIONS — populate concrete price
 function updateConcretePrice() {
   const sq = D.width * D.length;
   document.getElementById('conPriceDisplay').textContent = sq.toLocaleString() + ' sq ft';
@@ -732,9 +788,7 @@ function toggleConcrete() {
   if(idx > -1) D.options.splice(idx, 1); else D.options.push('concrete');
 }
 function togOpt(el, id) {
-  // Handle mutual exclusivity for site plans/permitting/bundle
   if(id==='site_and_permit') {
-    // If selecting bundle, deselect individual
     document.querySelectorAll('[data-opt="site_plans"],[data-opt="permitting"]').forEach(e=>{e.classList.remove('on');const i=D.options.indexOf(e.dataset.opt);if(i>-1)D.options.splice(i,1);});
   } else if(id==='site_plans'||id==='permitting') {
     document.querySelectorAll('[data-opt="site_and_permit"]').forEach(e=>{e.classList.remove('on');const i=D.options.indexOf('site_and_permit');if(i>-1)D.options.splice(i,1);});
@@ -744,28 +798,22 @@ function togOpt(el, id) {
   const idx = D.options.indexOf(id);
   if(idx>-1) D.options.splice(idx,1); else D.options.push(id);
 }
-// Add data-opt attributes
 document.querySelectorAll('.oitem').forEach(el => {
   const onclick = el.getAttribute('onclick');
   const match = onclick.match(/'([^']+)'/);
   if(match) el.dataset.opt = match[1];
 });
 
-// STEP 5: LEAN-TO
+// STEP 6: LEAN-TO
 function showLeanConfig(show) {
   document.getElementById('leanConfig').style.display = show ? 'block' : 'none';
   document.getElementById('leanContinueBtn').style.display = 'inline-block';
-  if(!show) {
-    D.leanTo = 'none';
-    confirmLeanTo();
-  }
+  if(!show) { D.leanTo = 'none'; confirmLeanTo(); }
 }
 function skipLeanTo() {
-  D.leanTo = 'none';
-  D.leanLeft = null;
-  D.leanRight = null;
+  D.leanTo = 'none'; D.leanLeft = null; D.leanRight = null;
   updateConcretePrice();
-  goStep(6);
+  goStep(7);
 }
 function pickLeanSide(side) {
   document.querySelectorAll('.lean-side-btn').forEach(b => b.classList.remove('on'));
@@ -774,7 +822,6 @@ function pickLeanSide(side) {
   const maxW = D.width || 60;
   const maxL = D.length || 400;
   const maxH = D.height || 16;
-  // Populate dropdowns (width capped at half building width)
   const leanMaxW = Math.floor(maxW / 2);
   function fillSel(id, max, step, suffix) {
     const sel = document.getElementById(id);
@@ -801,12 +848,12 @@ function confirmLeanTo() {
     }
   }
   updateConcretePrice();
-  goStep(6);
+  goStep(7);
 }
 
-function confirmOptions() { goStep(7); }
+function confirmOptions() { goStep(8); }
 
-// STEP 6: DETAILS
+// STEP 8: DETAILS
 let selTimeline = null;
 function pickRadio(el, val) {
   el.closest('.rgroup').querySelectorAll('.ritem').forEach(r=>r.classList.remove('on'));
@@ -816,47 +863,45 @@ function pickRadio(el, val) {
 function confirmDetails() {
   D.notes = document.getElementById('specialNotes').value;
   D.timeline = selTimeline || 'not specified';
-  goStep(8);
+  goStep(9);
 }
 
-// STEP 7: SUBMIT
+// STEP 9: SUBMIT
 function submitLead() {
   const n = document.getElementById('leadName').value.trim();
   const p = document.getElementById('leadPhone').value.trim();
   const e = document.getElementById('leadEmail').value.trim();
   if(!n||!p) { alert('Please enter your name and phone number.'); return; }
-  D.name = n;
-  D.phone = p;
-  D.email = e;
+  D.name = n; D.phone = p; D.email = e;
   D.timestamp = new Date().toISOString();
   D.source = 'landing-page-v1';
 
   const contactMethod = p ? 'Phone' : 'Email';
   const leadPriority = p ? 'HOT - Call ASAP' : 'WARM - Email Quote';
 
-  // Build quote summary
   const frameSummary = D.frameouts.length > 0
-    ? D.frameouts.map((f,i) => `Frame-Out ${i+1}: ${f.width}' x ${f.height}'`).join(', ')
+    ? D.frameouts.map((f,i) => 'Frame-Out '+(i+1)+': '+f.width+'\' x '+f.height+'\'').join(', ')
     : 'None';
+
+  // Wind rating label for HubSpot
+  const windLabel = D.windRating === '180' ? 'Yes (Cat 5 / 180mph)' : D.windRating === '170' ? '170mph Enhanced' : '140mph Standard';
+
   const quoteJson = JSON.stringify(D, null, 2);
 
   // ---- Netlify Forms submission ----
   try {
     const payload = {
       "form-name": "cat5-landing-leads",
-      name: n,
-      phone: p,
-      email: e,
-      zip: D.zip,
+      name: n, phone: p, email: e, zip: D.zip,
       buildingType: D.style,
       buildingSize: D.width + 'x' + D.length + 'x' + D.height,
+      windRating: D.windRating + ' MPH',
       garageDoors: D.garageDoors > 0 ? (D.garageDoorSizes || []).join(', ') : '0',
       walkInDoors: String(D.walkInDoors),
       windows: String(D.windows),
       frameouts: frameSummary,
       options: D.options.join(', '),
-      notes: D.notes,
-      timeline: D.timeline,
+      notes: D.notes, timeline: D.timeline,
       quoteJson: quoteJson
     };
     fetch("/", {
@@ -871,20 +916,18 @@ function submitLead() {
   // ---- HubSpot CRM via Netlify Function ----
   try {
     const hubspotPayload = {
-      name: n,
-      phone: p,
-      email: e,
-      location: D.zip,
+      name: n, phone: p, email: e, location: D.zip,
       buildingType: D.style,
       buildingSize: D.width + 'x' + D.length + 'x' + D.height,
       building_size: D.width + 'x' + D.length + 'x' + D.height,
       roofStyle: 'Vertical (Standard)',
-      cat5Wind: 'Yes (Cat 5 / 180mph)',
+      cat5Wind: windLabel,
       upgrades: D.options.join(', '),
       quote_details: [
         'Priority: ' + leadPriority,
         'Source: Landing Page Configurator',
         'Building: ' + D.style + ' ' + D.width + 'x' + D.length + 'x' + D.height,
+        'Wind Rating: ' + D.windRating + ' MPH' + (D.windRating === '180' ? ' (Cat5)' : ''),
         'Garage Doors: ' + (D.garageDoors > 0 ? (D.garageDoorSizes || []).join(', ') : 'None'),
         'Walk-In Doors: ' + D.walkInDoors,
         'Windows (24x36): ' + D.windows,
@@ -907,7 +950,7 @@ function submitLead() {
 
   console.log('LEAD CAPTURED:', quoteJson);
   document.getElementById('confName').textContent = "YOU'RE ALL SET, " + n.toUpperCase();
-  goStep(9);
+  goStep(10);
 }
 
 // Phone number formatting
@@ -933,6 +976,7 @@ document.addEventListener('DOMContentLoaded', function() {
   <input type="text" name="zip" />
   <input type="text" name="buildingType" />
   <input type="text" name="buildingSize" />
+  <input type="text" name="windRating" />
   <input type="text" name="garageDoors" />
   <input type="text" name="walkInDoors" />
   <input type="text" name="windows" />
