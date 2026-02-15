@@ -29,11 +29,12 @@ exports.handler = async (event, context) => {
         email: data.email,
         phone: data.phone || '',
         city: data.location || '',
+        zip: data.zip || '',
         contact_method: contactMethod,  // "Phone" or "Email"
         building_type: data.buildingType || '',
         building_size: data.building_size || data.buildingSize || '',
         roof_style: data.roofStyle || '',
-        cat_5_wind_rating: data.cat5Wind || '',  // Fixed: correct field name with underscores
+        cat_5_wind_rating: data.cat5Wind || '',
         selected_upgrades: data.upgrades || '',
         quote_details: quoteDetails
       }
