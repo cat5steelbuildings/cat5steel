@@ -707,30 +707,6 @@
                 </ul>
             </div>
 
-            <div class="pricing-breakdown">
-                <h4>📊 Our Pricing Structure (may change without notice):</h4>
-                <div class="tier-row">
-                    <span>Up to 600 sq ft:</span>
-                    <strong>$6,500 flat rate</strong>
-                </div>
-                <div class="tier-row">
-                    <span>600 - 1,000 sq ft:</span>
-                    <strong>$9.50 per sq ft</strong>
-                </div>
-                <div class="tier-row">
-                    <span>1,000 - 1,500 sq ft:</span>
-                    <strong>$8.50 per sq ft</strong>
-                </div>
-                <div class="tier-row">
-                    <span>1,500 - 2,000 sq ft:</span>
-                    <strong>$8.00 per sq ft</strong>
-                </div>
-                <div class="tier-row">
-                    <span>2,000+ sq ft:</span>
-                    <strong>$8.00 per sq ft</strong>
-                </div>
-                <p style="margin-top: 10px; font-style: italic;">*Prices assume level site within standard service area. Distance and grading may affect final price. Quotes good for 14 days.</p>
-            </div>
         </div>
     </div>
 
@@ -869,20 +845,13 @@
            Currently using placeholder tiers.
            UPDATE THESE after sitting down with Nick!
            ======================================================== */
-        function getDistanceMultiplier(hours) {
-            // TODO: Replace with Nick's actual distance pricing
-            // These are placeholder estimates
-            if (hours <= 1.5) return { multiplier: 1.00, label: '' };
-            if (hours <= 2.5) return { multiplier: 1.00, label: '' };
-            if (hours <= 3.5) return { multiplier: 1.00, label: '' };
-            return { multiplier: 1.00, label: '' };
-            
-            /* FUTURE: Uncomment and adjust after Nick meeting
-            if (hours <= 1.5) return { multiplier: 1.00, label: 'Standard service area' };
-            if (hours <= 2.5) return { multiplier: 1.10, label: 'Extended area (+10%)' };
-            if (hours <= 3.5) return { multiplier: 1.20, label: 'Long distance (+20%)' };
-            return { multiplier: 1.30, label: 'Remote area (+30%)' };
-            */
+        function getDistanceSurcharge(miles) {
+            // $500 per every 75 miles from Cordele, GA
+            // First 75 miles = no charge (Nick's local area)
+            if (miles <= 75) return { surcharge: 0, label: '' };
+            const brackets = Math.ceil((miles - 75) / 75);
+            const surcharge = brackets * 500;
+            return { surcharge: surcharge, label: `Includes $${surcharge.toLocaleString()} distance fee (~${Math.round(miles)} mi from base)` };
         }
 
         /* ========================================================
@@ -1006,9 +975,9 @@
                 tierInfo = 'Minimum flat rate pricing';
             }
 
-            // Apply distance multiplier (currently 1.0 until Nick data is in)
-            const distData = getDistanceMultiplier(currentZipData.driveHours);
-            const finalPrice = Math.round(basePrice * distData.multiplier);
+            // Apply distance surcharge
+            const distData = getDistanceSurcharge(currentZipData.distance);
+            const finalPrice = Math.round(basePrice + distData.surcharge);
 
             // Display results
             document.getElementById('priceDisplay').textContent = '$' + finalPrice.toLocaleString('en-US', {minimumFractionDigits: 0, maximumFractionDigits: 0});
@@ -1034,7 +1003,7 @@
                 width: width,
                 squareFeet: sqft,
                 basePrice: basePrice,
-                distanceMultiplier: distData.multiplier,
+                distanceSurcharge: distData.surcharge,
                 finalPrice: finalPrice,
                 timestamp: new Date().toISOString()
             });
