@@ -19,7 +19,6 @@
             justify-content: center;
             padding: 20px;
 
-            /* Layer order: top → bottom */
             background-image:
                 linear-gradient(
                     rgba(255,255,255,0.75),
@@ -29,12 +28,11 @@
                 url('pexels-manoo-media-65214113-19913288.jpg'),
                 url('construction-5372898_1920.jpg');
 
-            /* Sizes correspond to the layers above */
             background-size:
-                cover,              /* overlay */
-                420px 420px,         /* logo watermark */
-                600px auto,          /* close-up worker */
-                cover;               /* crew photo */
+                cover,
+                420px 420px,
+                600px auto,
+                cover;
 
             background-position:
                 center,
@@ -49,8 +47,6 @@
                 no-repeat;
 
             background-attachment: fixed;
-
-            /* Gentle enhancement so images "pop" slightly */
             filter: contrast(1.06) saturate(1.10);
         }
 
@@ -116,6 +112,55 @@
             color: #1f2937;
             margin-bottom: 8px;
             font-size: 14px;
+        }
+
+        .zip-input {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            font-size: 18px;
+            text-align: center;
+            transition: all 0.3s;
+            letter-spacing: 2px;
+        }
+
+        .zip-input:focus {
+            outline: none;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+
+        .zip-input.error {
+            border-color: #ef4444;
+            box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1);
+        }
+
+        .zip-input.valid {
+            border-color: #10b981;
+            box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
+        }
+
+        .zip-message {
+            margin-top: 8px;
+            padding: 10px 14px;
+            border-radius: 6px;
+            font-size: 13px;
+            display: none;
+        }
+
+        .zip-message.outside-area {
+            background: #fef2f2;
+            border: 1px solid #fecaca;
+            color: #991b1b;
+            display: block;
+        }
+
+        .zip-message.in-area {
+            background: #ecfdf5;
+            border: 1px solid #a7f3d0;
+            color: #065f46;
+            display: block;
         }
 
         .dimension-inputs {
@@ -216,6 +261,13 @@
             opacity: 0.8;
         }
 
+        .price-result .distance-note {
+            font-size: 12px;
+            opacity: 0.7;
+            margin-top: 8px;
+            font-style: italic;
+        }
+
         .calculate-btn {
             width: 100%;
             background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
@@ -238,6 +290,13 @@
 
         .calculate-btn:active {
             transform: translateY(0);
+        }
+
+        .calculate-btn:disabled {
+            background: #9ca3af;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
         }
 
         .cta-section {
@@ -352,12 +411,12 @@
             }
         }
     
-        /* --- Branded header (small logo on the left) --- */
+        /* --- Branded header --- */
         .header.header-brand {
             background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
             color: white;
             padding: 16px 20px;
-            text-align: left; /* override old center */
+            text-align: left;
         }
 
         .header-inner {
@@ -371,8 +430,8 @@
             height: 42px;
             flex-shrink: 0;
             border-radius: 50%;
-            object-fit: cover;        /* fill the circle */
-            object-position: center;  /* keep centered */
+            object-fit: cover;
+            object-position: center;
             box-shadow: 0 6px 18px rgba(0,0,0,0.28);
             background: transparent;
             display: block;
@@ -406,21 +465,22 @@
         @media (max-width: 600px) {
             .header.header-brand { padding: 18px 18px; }
             .brand-logo {
-            width: 42px;
-            height: 42px;
-            flex-shrink: 0;
-            border-radius: 50%;
-            object-fit: cover;        /* fill the circle */
-            object-position: center;  /* keep centered */
-            box-shadow: 0 6px 18px rgba(0,0,0,0.28);
-            background: transparent;
-            display: block;
-        }
+                width: 42px;
+                height: 42px;
+                flex-shrink: 0;
+                border-radius: 50%;
+                object-fit: cover;
+                object-position: center;
+                box-shadow: 0 6px 18px rgba(0,0,0,0.28);
+                background: transparent;
+                display: block;
+            }
             .brand-title { font-size: 18px; }
             .brand-subtitle { font-size: 14px; }
             .brand-tagline { font-size: 12px; }
         }
-/* --- Subtle secondary offer (steel buildings) --- */
+
+        /* --- Secondary offer --- */
         .secondary-offer {
             text-align: center;
             margin: 16px 0 26px;
@@ -594,6 +654,13 @@
                 <p>Serving most areas in FL, GA & AL. We give you instant, honest pricing - no games, no surprises.</p>
             </div>
 
+            <!-- ZIP CODE FIELD -->
+            <div class="input-group">
+                <label>Your Zip Code:</label>
+                <input type="text" id="zipCode" class="zip-input" placeholder="Enter zip code" maxlength="5" inputmode="numeric" pattern="[0-9]*">
+                <div id="zipMessage" class="zip-message"></div>
+            </div>
+
             <div class="input-group">
                 <label>Enter Your Pad Dimensions:</label>
                 <div class="dimension-inputs">
@@ -613,13 +680,15 @@
                 <div class="label">Your Estimated Cost</div>
                 <div class="price" id="priceDisplay">$0</div>
                 <div class="tier" id="tierDisplay"></div>
-            
-</div>
-<div class="secondary-offer">
-    <a href="/">
-        Looking For a Steel Building Price? <strong>Get an instant quote! →</strong>
-    </a>
-</div>
+                <div class="distance-note" id="distanceNote"></div>
+            </div>
+
+            <div class="secondary-offer">
+                <a href="/">
+                    Looking For a Steel Building Price? <strong>Get an instant quote! →</strong>
+                </a>
+            </div>
+
             <div class="cta-section">
                 <h3>We Can Start as Soon as You're Ready!</h3>
                 <button class="contact-btn" onclick="window.location.href='tel:850-400-8351'">📞 Call Now to Schedule</button>
@@ -660,7 +729,7 @@
                     <span>2,000+ sq ft:</span>
                     <strong>$8.00 per sq ft</strong>
                 </div>
-                <p style="margin-top: 10px; font-style: italic;">*Prices assume level site. Grading may be additional if needed. Quotes good for 14 days.</p>
+                <p style="margin-top: 10px; font-style: italic;">*Prices assume level site within standard service area. Distance and grading may affect final price. Quotes good for 14 days.</p>
             </div>
         </div>
     </div>
@@ -677,6 +746,7 @@
             
             <div class="quote-summary">
                 <h3>Your Quote Details:</h3>
+                <p><strong>Location:</strong> <span id="modalZip"></span></p>
                 <p><strong>Dimensions:</strong> <span id="modalDimensions"></span></p>
                 <p><strong>Square Feet:</strong> <span id="modalSqft"></span></p>
                 <p><strong>Estimated Cost:</strong> <span id="modalPrice"></span></p>
@@ -706,7 +776,177 @@
     </div>
 
     <script>
-        // Auto-calculate as user types
+        /* ========================================================
+           MIAMI-DADE ZIP CODES - DO NOT SERVE
+           Covers 33010-33299 range (Miami-Dade County)
+           ======================================================== */
+        const MIAMI_DADE_ZIPS = new Set([
+            // Core Miami-Dade zip codes
+            '33010','33011','33012','33013','33014','33015','33016','33017','33018','33019',
+            '33020','33021','33022','33023','33024','33025','33026','33027','33028','33029',
+            '33030','33031','33032','33033','33034','33035','33039',
+            '33054','33055','33056',
+            '33060','33061','33062','33063','33064','33065','33066','33067','33068','33069',
+            '33070','33071','33072','33073','33074','33075','33076','33077',
+            '33080','33081','33082','33083','33084',
+            '33090','33092','33093',
+            '33101','33102','33106','33107','33109','33110','33111','33112',
+            '33114','33116','33119',
+            '33121','33122','33124','33125','33126','33127','33128','33129',
+            '33130','33131','33132','33133','33134','33135','33136','33137','33138','33139',
+            '33140','33141','33142','33143','33144','33145','33146','33147','33148','33149',
+            '33150','33151','33152','33153','33154','33155','33156','33157','33158',
+            '33160','33161','33162','33163','33164','33165','33166','33167','33168','33169',
+            '33170','33172','33173','33174','33175','33176','33177','33178','33179',
+            '33180','33181','33182','33183','33184','33185','33186','33187','33188','33189',
+            '33190','33193','33194','33196','33197',
+            '33199',
+            '33206','33222','33231','33233','33234','33238','33239',
+            '33242','33243','33245','33247',
+            '33255','33256','33257','33261','33265','33266','33269',
+            '33280','33283','33296','33299'
+        ]);
+
+        /* ========================================================
+           NICK'S BASE LOCATION - Cordele, GA (zip 31015)
+           Lat/Lng for distance calculation
+           ======================================================== */
+        const NICK_BASE = { lat: 31.9635, lng: -83.7741 }; // Cordele, GA
+
+        /* ========================================================
+           ZIP CODE TO APPROXIMATE LAT/LNG
+           We use a simple lookup for FL/GA/AL zips.
+           For now, we estimate based on zip prefix ranges.
+           This will be replaced with exact data once Nick's
+           pricing formula is locked in.
+           ======================================================== */
+        function getApproxCoords(zip) {
+            // Simple prefix-based approximation for distance estimates
+            // FL zips: 32xxx-34xxx
+            // GA zips: 30xxx-31xxx
+            // AL zips: 35xxx-36xxx
+            const prefix = parseInt(zip.substring(0, 3));
+            
+            // Florida
+            if (prefix >= 320 && prefix <= 329) return { lat: 30.5, lng: -84.3 };   // North FL (Tallahassee area)
+            if (prefix >= 330 && prefix <= 339) return { lat: 26.1, lng: -80.1 };   // South FL (Miami/Ft Lauderdale)
+            if (prefix >= 340 && prefix <= 342) return { lat: 27.9, lng: -82.5 };   // Central FL (Tampa)
+            if (prefix >= 346 && prefix <= 349) return { lat: 28.5, lng: -81.4 };   // Central FL (Orlando)
+            
+            // Georgia
+            if (prefix >= 300 && prefix <= 305) return { lat: 33.7, lng: -84.4 };   // Atlanta area
+            if (prefix >= 306 && prefix <= 312) return { lat: 32.0, lng: -83.5 };   // Central/South GA
+            if (prefix >= 313 && prefix <= 319) return { lat: 31.5, lng: -84.2 };   // South GA
+            
+            // Alabama
+            if (prefix >= 350 && prefix <= 355) return { lat: 33.5, lng: -86.8 };   // Birmingham area
+            if (prefix >= 356 && prefix <= 362) return { lat: 32.4, lng: -86.3 };   // Montgomery area
+            if (prefix >= 363 && prefix <= 369) return { lat: 31.2, lng: -85.4 };   // Dothan/South AL
+            
+            return null; // Outside service area
+        }
+
+        function getDistanceMiles(lat1, lng1, lat2, lng2) {
+            // Haversine formula
+            const R = 3959; // Earth radius in miles
+            const dLat = (lat2 - lat1) * Math.PI / 180;
+            const dLng = (lng2 - lng1) * Math.PI / 180;
+            const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+                      Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+                      Math.sin(dLng/2) * Math.sin(dLng/2);
+            const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+            return R * c;
+        }
+
+        function estimateDriveHours(miles) {
+            // Rough estimate: avg 50 mph with stops
+            return miles / 50;
+        }
+
+        /* ========================================================
+           DISTANCE-BASED PRICING ADJUSTMENT
+           -------------------------------------------------------
+           Currently using placeholder tiers.
+           UPDATE THESE after sitting down with Nick!
+           ======================================================== */
+        function getDistanceMultiplier(hours) {
+            // TODO: Replace with Nick's actual distance pricing
+            // These are placeholder estimates
+            if (hours <= 1.5) return { multiplier: 1.00, label: '' };
+            if (hours <= 2.5) return { multiplier: 1.00, label: '' };
+            if (hours <= 3.5) return { multiplier: 1.00, label: '' };
+            return { multiplier: 1.00, label: '' };
+            
+            /* FUTURE: Uncomment and adjust after Nick meeting
+            if (hours <= 1.5) return { multiplier: 1.00, label: 'Standard service area' };
+            if (hours <= 2.5) return { multiplier: 1.10, label: 'Extended area (+10%)' };
+            if (hours <= 3.5) return { multiplier: 1.20, label: 'Long distance (+20%)' };
+            return { multiplier: 1.30, label: 'Remote area (+30%)' };
+            */
+        }
+
+        /* ========================================================
+           ZIP CODE VALIDATION
+           ======================================================== */
+        let currentZipData = { zip: '', inArea: false, distance: 0, driveHours: 0 };
+
+        document.getElementById('zipCode').addEventListener('input', function(e) {
+            // Only allow numbers
+            this.value = this.value.replace(/[^0-9]/g, '');
+            
+            const zip = this.value;
+            const msgEl = document.getElementById('zipMessage');
+            const calcBtn = document.querySelector('.calculate-btn');
+            
+            if (zip.length < 5) {
+                msgEl.className = 'zip-message';
+                this.className = 'zip-input';
+                calcBtn.disabled = false;
+                return;
+            }
+
+            // Check Miami-Dade
+            if (MIAMI_DADE_ZIPS.has(zip)) {
+                msgEl.className = 'zip-message outside-area';
+                msgEl.innerHTML = '<strong>⚠ Sorry!</strong> We do not currently service the Miami-Dade area. Please call us at (850) 320-8186 for referral options.';
+                this.className = 'zip-input error';
+                calcBtn.disabled = true;
+                currentZipData = { zip: zip, inArea: false, distance: 0, driveHours: 0 };
+                return;
+            }
+
+            // Check if in FL/GA/AL
+            const coords = getApproxCoords(zip);
+            if (!coords) {
+                msgEl.className = 'zip-message outside-area';
+                msgEl.innerHTML = '<strong>⚠ Outside Service Area</strong> We currently serve Florida, Georgia, and Alabama only. Call us at (850) 320-8186 to discuss your project.';
+                this.className = 'zip-input error';
+                calcBtn.disabled = true;
+                currentZipData = { zip: zip, inArea: false, distance: 0, driveHours: 0 };
+                return;
+            }
+
+            // Calculate distance from Nick's base
+            const distance = getDistanceMiles(NICK_BASE.lat, NICK_BASE.lng, coords.lat, coords.lng);
+            const driveHours = estimateDriveHours(distance);
+
+            currentZipData = {
+                zip: zip,
+                inArea: true,
+                distance: Math.round(distance),
+                driveHours: driveHours
+            };
+
+            msgEl.className = 'zip-message in-area';
+            msgEl.innerHTML = '<strong>✓ You\'re in our service area!</strong> Enter your pad dimensions below.';
+            this.className = 'zip-input valid';
+            calcBtn.disabled = false;
+        });
+
+
+        /* ========================================================
+           CALCULATOR
+           ======================================================== */
         document.getElementById('length').addEventListener('input', updateSquareFeet);
         document.getElementById('width').addEventListener('input', updateSquareFeet);
 
@@ -718,8 +958,20 @@
         }
 
         function calculatePrice() {
+            const zip = document.getElementById('zipCode').value;
             const length = parseFloat(document.getElementById('length').value);
             const width = parseFloat(document.getElementById('width').value);
+
+            if (!zip || zip.length < 5) {
+                alert('Please enter your zip code first!');
+                document.getElementById('zipCode').focus();
+                return;
+            }
+
+            if (!currentZipData.inArea) {
+                alert('Sorry, we do not service your area.');
+                return;
+            }
 
             if (!length || !width || length <= 0 || width <= 0) {
                 alert('Please enter valid dimensions for both length and width!');
@@ -727,59 +979,77 @@
             }
 
             const sqft = length * width;
-            let price = 0;
+            let basePrice = 0;
             let tierInfo = '';
 
             // Apply pricing tiers
             if (sqft <= 600) {
-                price = 6500;
+                basePrice = 6500;
                 tierInfo = 'Flat rate pricing (up to 600 sq ft)';
             } else if (sqft <= 1000) {
-                price = sqft * 9.50;
+                basePrice = sqft * 9.50;
                 tierInfo = `${sqft.toLocaleString()} sq ft × $9.50 per sq ft`;
             } else if (sqft <= 1500) {
-                price = sqft * 8.50;
+                basePrice = sqft * 8.50;
                 tierInfo = `${sqft.toLocaleString()} sq ft × $8.50 per sq ft`;
             } else if (sqft <= 2000) {
-                price = sqft * 8.00;
+                basePrice = sqft * 8.00;
                 tierInfo = `${sqft.toLocaleString()} sq ft × $8.00 per sq ft`;
             } else {
-                price = sqft * 8.00;
+                basePrice = sqft * 8.00;
                 tierInfo = `${sqft.toLocaleString()} sq ft × $8.00 per sq ft`;
             }
 
-            // Ensure minimum price of $6,500
-            if (price < 6500) {
-                price = 6500;
+            // Ensure minimum price
+            if (basePrice < 6500) {
+                basePrice = 6500;
                 tierInfo = 'Minimum flat rate pricing';
             }
 
-            // Display results
-            document.getElementById('priceDisplay').textContent = '$' + price.toLocaleString('en-US', {minimumFractionDigits: 0, maximumFractionDigits: 0});
-            document.getElementById('tierDisplay').textContent = tierInfo;
-            document.getElementById('priceResult').classList.add('show');
+            // Apply distance multiplier (currently 1.0 until Nick data is in)
+            const distData = getDistanceMultiplier(currentZipData.driveHours);
+            const finalPrice = Math.round(basePrice * distData.multiplier);
 
-            // Scroll to result
+            // Display results
+            document.getElementById('priceDisplay').textContent = '$' + finalPrice.toLocaleString('en-US', {minimumFractionDigits: 0, maximumFractionDigits: 0});
+            document.getElementById('tierDisplay').textContent = tierInfo;
+            
+            // Show distance note if applicable
+            const distNote = document.getElementById('distanceNote');
+            if (distData.label) {
+                distNote.textContent = distData.label;
+                distNote.style.display = 'block';
+            } else {
+                distNote.style.display = 'none';
+            }
+
+            document.getElementById('priceResult').classList.add('show');
             document.getElementById('priceResult').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
 
-            // Log for CRM integration
             console.log('Concrete Quote Generated:', {
+                zip: currentZipData.zip,
+                distanceMiles: currentZipData.distance,
+                driveHours: currentZipData.driveHours.toFixed(1),
                 length: length,
                 width: width,
                 squareFeet: sqft,
-                estimatedPrice: price,
+                basePrice: basePrice,
+                distanceMultiplier: distData.multiplier,
+                finalPrice: finalPrice,
                 timestamp: new Date().toISOString()
             });
         }
 
-        // Allow Enter key to calculate
+        // Enter key to calculate
         document.addEventListener('keypress', function(e) {
             if (e.key === 'Enter') {
                 calculatePrice();
             }
         });
 
-        // Modal functions
+        /* ========================================================
+           MODAL / FORM SUBMISSION
+           ======================================================== */
         let currentQuoteData = {};
 
         function openEmailModal() {
@@ -788,27 +1058,29 @@
             const sqft = length * width;
             const priceText = document.getElementById('priceDisplay').textContent;
             const tierText = document.getElementById('tierDisplay').textContent;
+            const zip = document.getElementById('zipCode').value;
 
             if (sqft === 0) {
                 alert('Please calculate your quote first by entering dimensions.');
                 return;
             }
 
-            // Store quote data
             currentQuoteData = {
                 length: length,
                 width: width,
                 squareFeet: sqft,
                 price: priceText,
-                tier: tierText
+                tier: tierText,
+                zip: zip,
+                distance: currentZipData.distance,
+                driveHours: currentZipData.driveHours
             };
 
-            // Populate modal
+            document.getElementById('modalZip').textContent = zip;
             document.getElementById('modalDimensions').textContent = `${length}' × ${width}'`;
             document.getElementById('modalSqft').textContent = sqft.toLocaleString();
             document.getElementById('modalPrice').textContent = priceText;
 
-            // Show modal
             document.getElementById('emailModal').classList.add('show');
         }
 
@@ -818,7 +1090,6 @@
             document.getElementById('emailQuoteForm').reset();
         }
 
-        // Close modal when clicking outside
         window.onclick = function(event) {
             const modal = document.getElementById('emailModal');
             if (event.target === modal) {
@@ -833,7 +1104,6 @@
             const submitBtn = event.target.querySelector('button[type="submit"]');
             const originalBtnText = submitBtn.textContent;
 
-            // Disable button
             submitBtn.disabled = true;
             submitBtn.textContent = 'Sending...';
             formMessage.className = 'form-message';
@@ -842,11 +1112,14 @@
                 name: document.getElementById('customerName').value,
                 phone: document.getElementById('customerPhone').value,
                 email: document.getElementById('customerEmail').value,
+                zip: currentQuoteData.zip,
                 buildingType: 'CONCRETE PAD',
                 building_size: `${currentQuoteData.length}' x ${currentQuoteData.width}' (${currentQuoteData.squareFeet} sq ft)`,
                 quote_details: `🟦 CONCRETE QUOTE 🟦
 ${currentQuoteData.price}
 Dimensions: ${currentQuoteData.length}' x ${currentQuoteData.width}' = ${currentQuoteData.squareFeet} sq ft
+Zip Code: ${currentQuoteData.zip}
+Distance from base: ~${currentQuoteData.distance} miles (~${currentQuoteData.driveHours.toFixed(1)} hrs)
 Pricing: ${currentQuoteData.tier}
 Source: cat5steelbuildings.com/concrete`
             };
@@ -866,7 +1139,6 @@ Source: cat5steelbuildings.com/concrete`
                     formMessage.className = 'form-message success';
                     formMessage.innerHTML = '<strong>✓ Quote Sent!</strong><br>Check your email and we\'ll be in touch shortly.';
                     
-                    // Clear form
                     setTimeout(() => {
                         closeEmailModal();
                     }, 3000);
